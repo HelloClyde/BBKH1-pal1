@@ -1,126 +1,61 @@
-# H1 PAL v0.1.4 图标修订与验证
+# H1 PAL v0.1.5 A/B 盘验证
 
-## 开源构建核对
+日期：2026-10-20。正式 BDA SHA-256：
+`9da4c89cdfbe68df8d9e20d570922f5facbf14a718c5f80d2396803e89bca7d7`，2419024 字节。
+测试 BDA：`7b5f34f3376cae50bc259ddf1fb3c287c9c08a96f7072556deeb5f99768aa037`。
+SDK 和 SDLPAL 固定提交未改变。详细结果见 [发布验证记录](evidence/release-v0.1.5.json)。
 
-独立目录只保留应用源码、工具、文档和图标；SDK 与 SDLPAL 作为固定提交子模块。
-固定 GCC `__DATE__` 使用的 `SOURCE_DATE_EPOCH=1792368000` 后，独立目录重编译得到与下列固件检查
-完全相同的 BDA。资源无关测试实际执行了该 BDA 的 MIPS UI、战斗背景、显示模式/触摸与缺资源退出代码，
-另通过两个 PAK 容器主机测试。公共 CI 只运行这些无需游戏资源或固件的检查。
-依赖提交、版本和当前 BDA 哈希见 [公开发布记录](evidence/release-v0.1.4.json)。
+## 选择规则
 
-另完成干净 Git 检出：两个子模块从公开远端下载，工具链安装器校验固定压缩包后重新编译。
-还展开完整源码 ZIP，在没有依赖 Git 元数据的情况下按清单校验并编译。两次 BDA 均与当前哈希完全相同。
-本地 Python 版本为 3.11.5；Actions 配置使用 3.12，远端运行结果应以实际 Actions 状态为准。
+在首次日志、配置和资源读取之前，用原生文件接口查找 A 盘主资源包；不存在时查 B。
+以 `应用\数据\PAL\PAL9588.PAK` 为准，目录或视频包单独存在不影响主包选择。
+选择后固定整次运行使用的目录，两个 PAK、默认存档、配置和日志都使用同一盘。
+A 包存在但损坏时保持 A 并报错，不把 B 盘的游戏进度混入本次运行。
+探测句柄立即关闭；缺资源提示同时显示 A/B 两条路径。
 
-## 2026-10-20 图标修订
+## 真实 MIPS 与文件服务模型
 
-使用内置 GPT Image 重新设计图标，保留原红色书法“仙”主体，参考实际 H1 桌面的圆角亮面图标。
-生成原图为 `assets/icon-h1-gpt.png`（1254×1254 RGBA），直接用作 `assets/icon.png`，保留透明通道。
-提示词和来源分别见 `assets/icon-prompt.txt`、`assets/icon-provenance.json`。
+`tests/data_drives.py` 在实际正式 BDA 上使用原创微型 PAK，公开 CI 无需原游戏资源。
+七种场景：只有 A、只有 B、两盘都有、A 只有目录/配置/视频、B 没有视频而 A 有视频、两盘均缺主包、A 主包损坏而 B 有正常主包。
+检查读取的主包内容、视频来源、存档/配置/日志写入与读回，以及句柄回收。
+选择 B 时，不覆盖 A 盘现有配置，也不往 A 写入存档和日志。
 
-当前正式文件为 `dist/仙剑1.bda`，内部 GBK 标题为“仙剑1”；`dist/H1PAL.bda` 是同内容兼容副本。
-文件大小 2418556 字节，SHA-256：
-`0d95916daebcec5f70cac0bca37d9c5804dafac7fe8512aea566f877955ac20b`。
+`tests/save_roundtrip.py --drive A` 与 `--drive B` 使用用户的真实游戏主资源和测试 BDA，
+分别执行 SDLPAL 的保存、独立重启、读取与内容核对。两盘均正确读回 183488 字节存档，
+日志路径匹配所选盘，文件句柄和分配均无残留。该检查依赖私有资源，不进入公共 CI。
 
-SDK 结构校验通过；从最终 BDA 解码检查 45×45、57×57 和两个 49×60 资源。
-与上一版逐字节对比，头部和 `0x785C` 起的完整执行载荷均相同，只有四个图标资源改变。
-校验报告为 `build/verification/icon/validation.json`。此次没有重复执行下列游戏逻辑测试。
+正式 BDA 的 UI、战斗背景、显示模式/触摸和缺资源退出检查继续通过；两个 PAK 容器主机测试通过。
+新功能不修改游戏数据或存档格式，不自动搬运原存档。
 
-完整 H1 V1.41 固件模拟器使用独立 NAND `build/firmware-icon/`，
-[桌面截图](evidence/desktop-icon.png) 确认原生图标尺寸下“仙”字和“仙剑1”标签清晰。
-实际点击图标可进入 [480×272 启动主菜单](evidence/title-icon-revision.png)，
-组合键退出后 opened=0 并返回桌面。测试结束已停止本次模拟器，未连接物理 H1。
+## 完整 H1 固件
 
-下列内容保留上一版的菜单与游戏验证记录；其 BDA 哈希属于更换图标前的构建。
-独立历史记录见 [v0.1.4 菜单验证](verification-v0.1.4.md)。
+独立私有 NAND，H1/Y100 V1.41，QEMU bbkh1，64 MiB。只操作本次端口和镜像，已结束并停止。
+实际正式 BDA 的主菜单、旧存档地图均为 480×272；读取既有存档后正常显示剧情与地图。
+日志记录 `DATA_PATH A:\应用\数据\PAL\`，退出 opened=0、END status=0，音频 dropped/failures/underruns 均为 0。
 
-## v0.1.4 菜单全屏与对齐原验证记录
-
-本地验证记录。未连接或操作物理 H1。
-
-正式 BDA：`376f81a83a8b9c1c12a2f1c77464eb346e3bd9da717a608fec1f00d058a0d05a`，
-2418556 字节；测试 BDA：
-`a797dc2889eba5dce628b21ce5834219d6310d583a9d920b6b54a8a527eee5ce`。
-
-## 菜单显示方式
-
-启动主菜单、存读档、人物状态、装备、仙术、物品、商店和确认窗口均采用 360×204 的画布，
-横纵统一按 4/3 显示到 480×272，不再退回 435×272 的固定画幅显示。
-
-启动背景按与战斗相同的等比覆盖方式铺满；状态/装备原图包含装备格和文字，
-因此完整保留中央 320×200 像素，只把无内容的边缘纹理延伸到新增区域。
-头像、装备图、汉字和数字不参与背景的覆盖缩放，保持相同比例与原有格位。
-UI 画布独立于地图和战斗分类，备份、局部刷新及界面返回均保存对应边缘。
-
-V 仍可主动切换标准视野等比和原尺寸；默认模式为全屏。
-AVI 视频继续保留原片比例，不属于本次菜单排版变更。
-
-## 光标与装备名称
-
-仙术/物品列表的原指针画在汉字下部，覆盖 16 像素字体。
-现改为左侧右指三角，按字高垂直居中，不再占用文字区域；任意行列使用相同的文字锚点。
-
-默认装备页的名称坐标对齐原 DOS 背景标签的 y=10+22×行号，名称起点保留标签间距。
-状态页装备名称按实际字宽在 50 像素图标格下居中，并限制在画面内。
-用户自定义布局保持其配置坐标。
-
-[仙术修正截图](evidence/ui-magic-aligned.png) 来自完整固件正式 BDA。
-[装备修正截图](evidence/ui-equipment-aligned.png) 来自实际 MIPS 测试 BDA，带未保存的菜单测试物品。
-
-## 实际 MIPS 验证
-
-`tests/ui_menus.py` 执行真实引擎菜单循环，以原生 H1 按键逐一取消并返回：
-启动、状态、装备、读档槽、游戏主菜单、物品子菜单、物品列表、
-仙术列表、施术者、道具目标、确认窗口、购买、出售，共 13 类。
-每类实际尺寸均为 480×272、逻辑画布均为 360×204；结束无残留句柄、分配或音频/窗口资源。
-截图在 `build/verification/ui/`，尺寸与构建哈希在 `ui-menus.json`。
-
-正式 BDA 的 `tests/wide_ui.py` 逐像素检查：
-状态/装备中央背景不变、标题等比覆盖、LCD 四角采样、备份恢复、边缘图标和三模式切换。
-光标检查覆盖不同行列，确认三角形完全位于文字左侧，没有改变字形区域。
-报告为 `wide-ui.json`。
-
-本版还通过地图逐像素对照/边缘 NPC/触摸、战斗全屏与获胜、存档重启读回、
-Steam 3～6 号视频抽样解码、主包启动/退出和缺资源退出检查。
-报告保留在 `build/verification/`，哈希对应上列正式或测试构建。
-
-## 完整 H1 V1.41 固件
-
-QEMU bbkh1、64 MiB、独立 NAND：`build/firmware-v014/`。
-使用正式 BDA，哈希与上列相同，读取既有存档，无菜单测试标记。
-
-实际确认：
-
-- 原视频启动后，标题主菜单和读档槽输出 480×272；
-- 旧存档读取后地图、游戏主菜单、人物状态、仙术、系统及存档槽均为 480×272；
-- 仙术光标位于名称左侧，状态页装备名称居中；
-- 状态页 V 依次切换 435×272、320×200、480×272，立即重绘；
-- 返回地图正常，组合键退出后 opened=0，回到桌面；
-- 日志 END status=0、951 帧，音频 dropped=0、failures=0、underruns=0，恢复原音量 51。
-
-该旧存档没有背包内可装备物品，正式 BDA 的装备列表为空；装备详情页的内容/名称检查使用上述 MIPS 菜单测试。
-没有把空列表截图当作装备详情页的验证。
-
-尺寸记录：同目录 `title.json`、`load-slots.json`、`status.json`、`magic-list.json`、
-`system-menu.json`、`save-slots.json`、`status-mode-*.json`、`exit-desktop.json`、`H1PAL.LOG`。
-可查看 [主菜单](evidence/title.png)、[状态页](evidence/ui-status-fullscreen.png)。
+[启动主菜单](evidence/v0.1.5-title.png) · [读取旧存档](evidence/v0.1.5-map.png)。
+本次完整固件只提供 A 盘；B 盘检查来自上述 MIPS 原生文件服务模型。
+未做物理 H1 真机、B 盘全固件或全剧情验证。
 
 ## 复现
 
 ```powershell
 python tools/build.py
-python tools/build.py --regression
+python tools/verify_release.py
+python tests/data_drives.py
 python tests/wide_ui.py
-python tests/ui_menus.py
 python tests/wide_battle.py
-python tests/wide_scene.py
-python tests/battle.py
 python tests/display_controls.py
-python tests/save_roundtrip.py
-python tests/steam_video.py
-python tests/mips_smoke.py --limit 8
+python tests/mips_smoke.py --missing
+python -m unittest discover -s tests -p "test_*.py"
 ```
 
-菜单流程测试依赖私有 `build/verification/native-1.rpg` 和用户游戏资源，不随源码或安装包分发。
-旧记录见 [v0.1.3](verification-v0.1.3.md)、[v0.1.2](verification-v0.1.2.md)。
-未进行物理 H1 性能、全剧情或长时间稳定性验证。
+私有主资源放入 `build/resources/PAL9588.PAK` 后：
+
+```powershell
+python tools/build.py --regression
+python tests/save_roundtrip.py --drive A
+python tests/save_roundtrip.py --drive B
+```
+
+历史记录：[v0.1.4 图标/开源验证](verification-icon-v0.1.4.md)、[v0.1.4 菜单验证](verification-v0.1.4.md)。

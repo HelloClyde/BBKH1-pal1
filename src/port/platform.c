@@ -105,5 +105,5 @@ void h1pal_platform_wait_action_release(void){
 }
 void H1PAL_FatalOutput(const char *message){
  h1pal_stats.error=1;h1pal_log("FATAL %s",message?message:"");h1pal_platform_close();
- h1_message_box(0,"\xCE\xDE\xB7\xA8\xB6\xC1\xC8\xA1\xCF\xC9\xBD\xA3\xD7\xCA\xD4\xB4\xA1\xA3\nA:\\\xD3\xA6\xD3\xC3\\\xCA\xFD\xBE\xDD\\PAL\\PAL9588.PAK","\xCF\xC9\xBD\xA3 1",0);
+ h1_message_box(0,"\xCE\xDE\xB7\xA8\xB6\xC1\xC8\xA1\xCF\xC9\xBD\xA3\xD7\xCA\xD4\xB4\xA1\xA3\nA:" H1PAL_DATA_DIRECTORY "PAL9588.PAK\nB:" H1PAL_DATA_DIRECTORY "PAL9588.PAK","\xCF\xC9\xBD\xA3 1",0);
 }

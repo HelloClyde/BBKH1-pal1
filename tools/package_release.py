@@ -46,14 +46,14 @@ def verify(out,tag=None,commit=None):
     if commit:assert manifest['application_commit']==commit
     from verify_release import EXPECTED
     assert manifest['version']==version and manifest['bda_sha256']==EXPECTED
-    expected={'仙剑1.bda','H1PAL.build.json','RELEASE-NOTES.md','release-manifest.json',
+    expected={'PAL1.bda','H1PAL.build.json','RELEASE-NOTES.md','release-manifest.json',
         f'BBKH1-pal1-v{version}-install.zip',f'BBKH1-pal1-v{version}-source.zip'}
     sums={}
     for line in (out/'SHA256SUMS.txt').read_text(encoding='utf-8').splitlines():
         digest,name=line.split('  ',1);assert safe(name) and '/' not in name and name not in sums
         assert sha((out/name).read_bytes())==digest,name;sums[name]=digest
     assert set(sums)==expected and {p.name for p in out.iterdir()}==expected|{'SHA256SUMS.txt'}
-    assert sums['仙剑1.bda']==manifest['bda_sha256']
+    assert sums['PAL1.bda']==manifest['bda_sha256']
     for name in expected:
         if not name.endswith('.zip'):continue
         with zipfile.ZipFile(out/name) as z:
@@ -80,17 +80,18 @@ def main():
     if args.tag:assert args.tag=='v'+version
     deps={k:v for k,v in read(ROOT/'UPSTREAM.json').items() if 'path' in v}
     reports={}
-    for name in ('release','wide-ui','wide-battle','display-controls','missing'):
+    for name in ('release','wide-ui','wide-battle','display-controls','missing','data-drives'):
         r=read(ROOT/f'build/verification/{name}.json');assert r['ok'] and r['sha256']==meta['sha256'];reports[name]=r
     for name,digest in meta['sources'].items():assert sha((ROOT/name).read_bytes())==digest,'Rebuild after source changes: '+name
     out.mkdir(parents=True,exist_ok=True)
     source(out/f'BBKH1-pal1-v{version}-source.zip',deps,commit)
-    bda=(ROOT/'dist/仙剑1.bda').read_bytes();(out/'仙剑1.bda').write_bytes(bda)
+    bda=(ROOT/'dist/仙剑1.bda').read_bytes();(out/'PAL1.bda').write_bytes(bda)
     (out/'H1PAL.build.json').write_bytes((ROOT/'dist/H1PAL.build.json').read_bytes())
     (out/'RELEASE-NOTES.md').write_bytes((ROOT/f'docs/release-v{version}.md').read_bytes())
     manifest={'version':version,'application_commit':commit,'dependencies':deps,'bda_sha256':meta['sha256'],
         'full_firmware_in_ci':False,'hardware_verified':False,'exact_bda_full_firmware_checked':True,
-        'full_firmware_scope':'2026-10-20 icon, title, launch and exit; reused exact binary evidence',
+        'full_firmware_scope':'H1 V1.41 launch/load/exit on A; A/B priority, same-volume I/O and real B save roundtrip in MIPS service model',
+        'download_filename':'PAL1.bda','install_filename':'仙剑1.bda',
         'game_resources_included':False,'checks':reports}
     (out/'release-manifest.json').write_bytes(json_bytes(manifest))
     install={'应用/程序/仙剑1.bda':bda,'安装说明.md':(ROOT/'README.md').read_bytes(),

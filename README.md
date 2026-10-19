@@ -1,11 +1,12 @@
 # 仙剑1 for BBK H1 / Y100
 
 基于 SDLPAL 的原生 H1 BDA，参考 HelloClyde 的 BBK9588-pal1 移植。
-适用于 H1 / Y100 V1.41，默认 480×272，应用名称为“仙剑1”。v0.1.4 为首次公开预发布。
+适用于 H1 / Y100 V1.41，默认 480×272，应用名称为“仙剑1”。v0.1.5 支持 A/B 盘资源自动选择。
 
 ## 快速开始
 
-从本项目 [Releases](https://github.com/HelloClyde/BBKH1-pal1/releases) 下载 `仙剑1.bda` 或程序安装 ZIP。
+从本项目 [Releases](https://github.com/HelloClyde/BBKH1-pal1/releases) 下载 `PAL1.bda` 或程序安装 ZIP。
+单独下载的 BDA 复制到设备时命名为“仙剑1.bda”；安装 ZIP 内已使用这个中文名称。
 程序 ZIP 只包含程序与说明；`PAL9588.PAK` 和 `PALVIDEO.PAK` 作为独立 Release 附件提供，
 也可从自己拥有的原版安装目录生成。两个 PAK 下载后按下列路径放置。
 已有上一版资源的用户只需替换 BDA，存档兼容。
@@ -15,6 +16,12 @@ A:\应用\程序\仙剑1.bda
 A:\应用\数据\PAL\PAL9588.PAK
 A:\应用\数据\PAL\PALVIDEO.PAK    （可选）
 ```
+
+资源也可放在 `B:\应用\数据\PAL\`。启动先检查 A 盘的 `PAL9588.PAK`，
+A 盘没有该主资源包时才检查 B 盘。两盘都有时始终选 A；A 盘只有目录或视频包不会阻止回退到 B。
+主资源和视频包使用同一盘，存档、配置和日志默认也写到所选盘的同一目录。
+不自动迁移旧存档；把资源移到 B 盘时，请一并复制需要保留的 `1.rpg`～`5.rpg` 和 `sdlpal.cfg`。
+A 盘主资源包存在但损坏时会提示错误，不会自动改用另一盘的存档。
 
 将程序与资源放到上述路径，重新进入 H1 桌面后点击“仙剑1”。
 缺少视频包时使用 DOS RNG 动画；主资源包必需。
@@ -42,15 +49,15 @@ Release 中的独立 PAK 附件保留原游戏资源权利，不属于源码的 
 
 | H1 完整固件：桌面图标 | H1 完整固件：启动菜单 |
 | --- | --- |
-| ![H1 桌面图标](docs/evidence/desktop-icon.png) | ![启动菜单](docs/evidence/title-icon-revision.png) |
+| ![H1 桌面图标](docs/evidence/desktop-icon.png) | ![启动菜单](docs/evidence/v0.1.5-title.png) |
 
 | H1 完整固件：地图 | H1 完整固件：仙术 |
 | --- | --- |
-| ![地图](docs/evidence/gameplay.png) | ![仙术](docs/evidence/ui-magic-aligned.png) |
+| ![地图](docs/evidence/v0.1.5-map.png) | ![仙术](docs/evidence/ui-magic-aligned.png) |
 
 ![战斗，完整 H1 固件模拟器](docs/evidence/battle-firmware.png)
 
-桌面和启动图对应本次图标修订；地图、仙术与战斗图对应此前的已记录构建，具体哈希与范围见验证文档。
+主菜单和地图来自 v0.1.5；其余截图对应此前的已记录构建，具体哈希与范围见验证文档。
 
 ## 操作
 
@@ -133,6 +140,7 @@ python tests/wide_ui.py
 python tests/wide_battle.py
 python tests/display_controls.py
 python tests/mips_smoke.py --missing
+python tests/data_drives.py
 ```
 
 本地真实游戏资源测试使用 `build/resources/PAL9588.PAK`；菜单与地图测试还需要使用者自己的
@@ -147,8 +155,9 @@ BDA、构建信息、验证清单及 SHA256SUMS；此公开打包入口不读取
 
 ## 验证范围
 
-当前 BDA SHA-256：`0d95916daebcec5f70cac0bca37d9c5804dafac7fe8512aea566f877955ac20b`。
-2026-10-20 的独立构建与完整 H1 固件中已检查图标、名称、启动和退出的程序逐字节相同。
+当前 BDA SHA-256：`9da4c89cdfbe68df8d9e20d570922f5facbf14a718c5f80d2396803e89bca7d7`。
+2026-10-20 的 v0.1.5 检查覆盖 A/B 主包优先级、同盘视频/存档/配置/日志、两盘缺资源和 A 包损坏。
+A、B 两盘分别通过真实引擎保存后重启读回测试；具体正式/测试 BDA 哈希与完整固件范围见验证记录。
 主机模型实际执行编译后的 MIPS 代码，检查 UI、战斗背景、模式/触摸和缺资源退出；它不能代替完整固件测试。
 此前地图、战斗、存档、视频与 13 类菜单的检查及不同构建哈希均保留在
 [当前验证](docs/verification.md) 和 [菜单验证](docs/verification-v0.1.4.md)。

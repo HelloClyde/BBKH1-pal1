@@ -1,0 +1,236 @@
+{
+  "version": "0.1.5",
+  "date": "2026-10-20",
+  "bda_sha256": "9da4c89cdfbe68df8d9e20d570922f5facbf14a718c5f80d2396803e89bca7d7",
+  "regression_bda_sha256": "7b5f34f3376cae50bc259ddf1fb3c287c9c08a96f7072556deeb5f99768aa037",
+  "sdk_commit": "067fe072477861dfc8949d7b1a55279fb92d2548",
+  "sdlpal_commit": "224cb0a0cc839e0e8ecaa299cd480b02b372b9f7",
+  "source_date_epoch": 1792368000,
+  "exact_bda_full_firmware_checked": true,
+  "full_firmware_scope": "Private H1 V1.41 QEMU NAND, A-selected title/map/load/exit; B is tested in the H1 service model, not full firmware or hardware",
+  "full_firmware_in_ci": false,
+  "hardware_verified": false,
+  "game_resources_in_source": false,
+  "checks": {
+    "data-drives": {
+      "ok": true,
+      "sha256": "9da4c89cdfbe68df8d9e20d570922f5facbf14a718c5f80d2396803e89bca7d7",
+      "kind": "actual MIPS filesystem with modeled H1 A/B volumes",
+      "cases": [
+        {
+          "case": "A only",
+          "selected": "A",
+          "ok": true
+        },
+        {
+          "case": "B only",
+          "selected": "B",
+          "ok": true
+        },
+        {
+          "case": "A wins",
+          "selected": "A",
+          "ok": true
+        },
+        {
+          "case": "A folder without main",
+          "selected": "B",
+          "ok": true
+        },
+        {
+          "case": "B ignores A video",
+          "selected": "B",
+          "ok": true
+        },
+        {
+          "case": "missing both",
+          "selected": "A",
+          "ok": true
+        },
+        {
+          "case": "damaged A is not replaced with B",
+          "selected": "A",
+          "ok": true
+        }
+      ],
+      "selected_volume_saves_config_log": true,
+      "video_stays_on_selected_volume": true,
+      "clean_handles": true
+    },
+    "wide-ui": {
+      "ok": true,
+      "sha256": "9da4c89cdfbe68df8d9e20d570922f5facbf14a718c5f80d2396803e89bca7d7",
+      "fullscreen": [
+        480,
+        272
+      ],
+      "central_status_pixels_identical": true,
+      "title_uniform_cover": true,
+      "portrait_slot_geometry_preserved": true,
+      "uniform_display": "4/3",
+      "backup_restore": true,
+      "icon_at_new_edge": true,
+      "cursor_no_text_overlap": true,
+      "three_modes": true,
+      "clean_exit": true,
+      "seconds": 0.69
+    },
+    "wide-battle": {
+      "ok": true,
+      "sha256": "9da4c89cdfbe68df8d9e20d570922f5facbf14a718c5f80d2396803e89bca7d7",
+      "background_scale": "9/8",
+      "display_scale": "4/3",
+      "fullscreen": [
+        480,
+        272
+      ],
+      "coordinate_grid_verified": true,
+      "four_rle_variants_at_edge": true,
+      "palette_shift": true,
+      "max_wave": true,
+      "modes": 3,
+      "clean_exit": true,
+      "seconds": 1.16
+    },
+    "display-controls": {
+      "ok": true,
+      "cycles": 2,
+      "modes": 3,
+      "fixed_artwork_aspect": true,
+      "engine_canvas_corners": true,
+      "static_redraw": true,
+      "held_key_no_repeat": true,
+      "avi_corners": true,
+      "touch_all_modes": true,
+      "sha256": "9da4c89cdfbe68df8d9e20d570922f5facbf14a718c5f80d2396803e89bca7d7"
+    },
+    "missing": {
+      "ok": true,
+      "kind": "cross-compiled MIPS with modeled H1 services",
+      "missing": true,
+      "stats": [
+        827081040,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "seconds": 0.05,
+      "seeks": 0,
+      "sha256": "9da4c89cdfbe68df8d9e20d570922f5facbf14a718c5f80d2396803e89bca7d7",
+      "leaked_handles": 0,
+      "leaked_allocations": 0
+    },
+    "save-roundtrip": {
+      "ok": true,
+      "environment": "real MIPS engine with modeled H1 services",
+      "drive": "A",
+      "save_size": 183488,
+      "log": "SAVE START\r\nSAVE PASS\r\nRELOAD START\r\nRELOAD PASS\r\n",
+      "sha256": "7b5f34f3376cae50bc259ddf1fb3c287c9c08a96f7072556deeb5f99768aa037",
+      "leaked_handles": [
+        0,
+        0
+      ],
+      "leaked_allocations": [
+        0,
+        0
+      ]
+    },
+    "save-roundtrip-B": {
+      "ok": true,
+      "environment": "real MIPS engine with modeled H1 services",
+      "drive": "B",
+      "save_size": 183488,
+      "log": "SAVE START\r\nSAVE PASS\r\nRELOAD START\r\nRELOAD PASS\r\n",
+      "sha256": "7b5f34f3376cae50bc259ddf1fb3c287c9c08a96f7072556deeb5f99768aa037",
+      "leaked_handles": [
+        0,
+        0
+      ],
+      "leaked_allocations": [
+        0,
+        0
+      ]
+    }
+  },
+  "native_A": {
+    "title": {
+      "sha256": "9da4c89cdfbe68df8d9e20d570922f5facbf14a718c5f80d2396803e89bca7d7",
+      "position": [
+        0,
+        0
+      ],
+      "stats": [
+        827081040,
+        1,
+        29,
+        0,
+        0,
+        106,
+        0,
+        0
+      ],
+      "display_mode": 0,
+      "width": 480,
+      "height": 272,
+      "logical_width": 360,
+      "logical_height": 204,
+      "map_full": 1,
+      "opened": 1,
+      "data_path": "A:\\应用\\数据\\PAL\\"
+    },
+    "map": {
+      "sha256": "9da4c89cdfbe68df8d9e20d570922f5facbf14a718c5f80d2396803e89bca7d7",
+      "position": [
+        11535488,
+        7340192
+      ],
+      "stats": [
+        827081040,
+        1,
+        106,
+        1,
+        0,
+        251,
+        0,
+        0
+      ],
+      "display_mode": 0,
+      "width": 480,
+      "height": 272,
+      "logical_width": 360,
+      "logical_height": 204,
+      "map_full": 1,
+      "opened": 1
+    },
+    "exit": {
+      "sha256": "9da4c89cdfbe68df8d9e20d570922f5facbf14a718c5f80d2396803e89bca7d7",
+      "position": [
+        0,
+        0
+      ],
+      "stats": [
+        827081040,
+        1,
+        378,
+        1,
+        0,
+        1109,
+        0,
+        0
+      ],
+      "display_mode": 0,
+      "width": 480,
+      "height": 272,
+      "logical_width": 360,
+      "logical_height": 204,
+      "map_full": 1,
+      "opened": 0
+    },
+    "log": "H1PAL 0.1.5 BEGIN\nDATA_PATH A:\\应用\\数据\\PAL\\\nVIDEO 480x272 stride=1920 bpp=32 lcd=0xa1902000\nAUDIO_OPEN_BEGIN source=22050 output=32000 mono=1 queue=0x8095f6a8\nAUDIO_DESCRIPTOR_BEGIN slot=0\nAUDIO_DESCRIPTOR_END slot=0 rc=1\nAUDIO_DEVICE_BEGIN\nAUDIO_DEVICE_END rc=1\nAUDIO_START_BEGIN\nAUDIO_START_END rc=1\nAUDIO_OPEN_END ready=1\nAUDIO_CLOSE_BEGIN batches=1109 submitted=1 nonzero=55126 dropped=0 failures=0 underruns=0\nAUDIO_VOLUME_RESTORE percent=51\nAUDIO_CLOSE_END descriptors=1\nEND status=0 frames=378 keys=1 taps=0\n"
+  }
+}

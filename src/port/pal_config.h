@@ -2,9 +2,9 @@
 #define PAL_H1_CONFIG_H
 
 #include <sys/time.h>
+#include "data_path.h"
 
-/* The 9588 filesystem ABI consumes raw GBK/ASCII byte strings. */
-#define PAL_H1_DATA_PATH            "A:\\\xd3\xa6\xd3\xc3\\\xca\xfd\xbe\xdd\\PAL\\"
+#define PAL_H1_DATA_PATH            h1pal_data_path
 #define PAL_PREFIX                    PAL_H1_DATA_PATH
 #define PAL_SAVE_PREFIX               PAL_H1_DATA_PATH
 #define PAL_CONFIG_PREFIX             PAL_H1_DATA_PATH

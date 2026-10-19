@@ -4,7 +4,9 @@ import hashlib,json,struct,sys
 
 ROOT=Path(__file__).resolve().parents[1]
 
-EXPECTED='0d95916daebcec5f70cac0bca37d9c5804dafac7fe8512aea566f877955ac20b'
+VERSION=(ROOT/'VERSION').read_text().strip()
+EVIDENCE=json.loads((ROOT/f'docs/evidence/release-v{VERSION}.json').read_text(encoding='utf-8'))
+EXPECTED=EVIDENCE['bda_sha256']
 
 def main():
     sys.path.insert(0,str(ROOT/'sdk'))
@@ -24,7 +26,7 @@ def main():
     assert data==(ROOT/'build/release/H1PAL.bda').read_bytes()
     result={'ok':True,'sha256':digest,'size':len(data),'version':meta['version'],
         'title':'仙剑1','sdk_commit':meta['sdk_commit'],'engine_commit':meta['engine_commit'],
-        'byte_identical_to_firmware_tested_bda':True,'hardware_verified':False,
+        'byte_identical_to_firmware_tested_bda':EVIDENCE['exact_bda_full_firmware_checked'],'hardware_verified':False,
         'ci_scope':'BDA format, reproducibility and separate MIPS service-model tests; no full firmware execution in CI'}
     out=ROOT/'build/verification';out.mkdir(parents=True,exist_ok=True)
     (out/'release.json').write_text(json.dumps(result,ensure_ascii=False,indent=2)+'\n',encoding='utf-8')

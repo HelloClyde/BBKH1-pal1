@@ -13,15 +13,17 @@ volatile struct h1pal_stats h1pal_stats={0x314c4150,1};
 void h1pal_log(const char *format,...) {
     char line[384];va_list ap;va_start(ap,format);
     vsnprintf(line,sizeof(line),format,ap);va_end(ap);
-    FILE *f=fopen(PAL_H1_DATA_PATH "H1PAL.LOG","ab");
+    FILE *f=h1pal_fopen_data("H1PAL.LOG","ab");
     if(f){fputs(line,f);fputs("\n",f);fclose(f);}
 }
 void h1pal_exit(int status) { exit_status=status;longjmp(return_point,1); }
 extern int h1pal_engine_main(void);
 int h1_app_main(void) {
     if(!setjmp(return_point)) {
-        FILE *f=fopen(PAL_H1_DATA_PATH "H1PAL.LOG","wb");if(f)fclose(f);
-        h1pal_log("H1PAL 0.1.4 BEGIN");
+        h1pal_select_data_path();
+        FILE *f=h1pal_fopen_data("H1PAL.LOG","wb");if(f)fclose(f);
+        h1pal_log("H1PAL 0.1.5 BEGIN");
+        h1pal_log("DATA_PATH %s",PAL_H1_DATA_PATH);
         exit_status=h1pal_engine_main();
     }
     h1pal_audio_close();

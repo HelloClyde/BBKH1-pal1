@@ -9,15 +9,15 @@ int testmain(int argc,char **argv) { (void)argc;(void)argv;extern void PAL_GameM
 #include <stdio.h>
 #include <string.h>
 
-#define SAVE_MARKER   PAL_H1_DATA_PATH "PORTTEST.SAVE"
-#define BATTLE_MARKER PAL_H1_DATA_PATH "PORTTEST.BATTLE"
-#define VIDEO_MARKER  PAL_H1_DATA_PATH "PORTTEST.VIDEO"
-#define SOUND_MARKER  PAL_H1_DATA_PATH "PORTTEST.SOUND"
-#define VIEW_MARKER   PAL_H1_DATA_PATH "PORTTEST.VIEW"
-#define INTERACTIVE_MARKER PAL_H1_DATA_PATH "PORTTEST.INTERACTIVE"
-#define UI_MARKER PAL_H1_DATA_PATH "PORTTEST.UI"
-#define TEST_LOG      PAL_H1_DATA_PATH "PORTTEST.LOG"
-#define SAVE_EXPECT   PAL_H1_DATA_PATH "PORTTEST.EXPECT"
+#define SAVE_MARKER   "PORTTEST.SAVE"
+#define BATTLE_MARKER "PORTTEST.BATTLE"
+#define VIDEO_MARKER  "PORTTEST.VIDEO"
+#define SOUND_MARKER  "PORTTEST.SOUND"
+#define VIEW_MARKER   "PORTTEST.VIEW"
+#define INTERACTIVE_MARKER "PORTTEST.INTERACTIVE"
+#define UI_MARKER "PORTTEST.UI"
+#define TEST_LOG      "PORTTEST.LOG"
+#define SAVE_EXPECT   "PORTTEST.EXPECT"
 
 #define SAVE_EXPECT_MAGIC 0x31545350u
 
@@ -50,7 +50,7 @@ extern unsigned h1pal_avi_last_exit_keys(void);
 
 static int file_exists(const char *path)
 {
-    FILE *file = fopen(path, "rb");
+    FILE *file = h1pal_fopen_data(path, "rb");
     if (!file) return 0;
     fclose(file);
     return 1;
@@ -71,7 +71,7 @@ int h1pal_regression_auto_battle(void)
 
 static void reset_log(const char *heading)
 {
-    FILE *file = fopen(TEST_LOG, "wb");
+    FILE *file = h1pal_fopen_data(TEST_LOG, "wb");
     if (!file) return;
     fputs(heading, file);
     fputs("\r\n", file);
@@ -80,7 +80,7 @@ static void reset_log(const char *heading)
 
 static void append_log(const char *line)
 {
-    FILE *file = fopen(TEST_LOG, "ab");
+    FILE *file = h1pal_fopen_data(TEST_LOG, "ab");
     if (!file) return;
     fputs(line, file);
     fputs("\r\n", file);
@@ -90,7 +90,7 @@ static void append_log(const char *line)
 static int saved_file_header_valid(void)
 {
     unsigned char header[2];
-    FILE *file = fopen(PAL_H1_DATA_PATH "2.rpg", "rb");
+    FILE *file = h1pal_fopen_data("2.rpg", "rb");
     size_t count;
     long length;
     if (!file) return 0;
@@ -104,7 +104,7 @@ static int saved_file_header_valid(void)
 
 static int read_save_expect(h1pal_save_expect_t *expect)
 {
-    FILE *file = fopen(SAVE_EXPECT, "rb");
+    FILE *file = h1pal_fopen_data(SAVE_EXPECT, "rb");
     size_t count;
     if (!file) return 0;
     count = fread(expect, 1, sizeof(*expect), file);
@@ -114,7 +114,7 @@ static int read_save_expect(h1pal_save_expect_t *expect)
 
 static int write_save_expect(const h1pal_save_expect_t *expect)
 {
-    FILE *file = fopen(SAVE_EXPECT, "wb");
+    FILE *file = h1pal_fopen_data(SAVE_EXPECT, "wb");
     size_t count;
     if (!file) return 0;
     count = fwrite(expect, 1, sizeof(*expect), file);

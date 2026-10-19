@@ -56,6 +56,8 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tests/mips_smoke.py --missing
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python tests/data_drives.py
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
       - name: Package program-only installer, complete source and checksums
         run: |
           python tools/package_release.py

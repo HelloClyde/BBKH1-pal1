@@ -16,8 +16,8 @@
 #include <sys/time.h>
 
 #define ALLOCATION_MAGIC 0x9588a110u
-#define PALPAK_PATH PAL_H1_DATA_PATH "PAL9588.PAK"
-#define PALVIDEO_PATH PAL_H1_DATA_PATH "PALVIDEO.PAK"
+#define PALPAK_PATH H1PAL_DEFAULT_DATA_PATH "PAL9588.PAK"
+#define PALVIDEO_PATH H1PAL_DEFAULT_DATA_PATH "PALVIDEO.PAK"
 #define PALPAK_HEADER_SIZE 32u
 #define PALPAK_ENTRY_SIZE 64u
 #define PALPAK_MAX_ENTRIES 256u
@@ -64,8 +64,11 @@ FILE *stderr = &g_stderr;
 
 static uint32_t g_random_state = 1u;
 static int g_palpak_last_error;
-static palpak_archive_t g_palpak_main = {PALPAK_PATH, 0, 0, 1};
-static palpak_archive_t g_palpak_video = {PALVIDEO_PATH, 0, 1, -1};
+char h1pal_data_path[] = H1PAL_DEFAULT_DATA_PATH;
+static char g_palpak_main_path[] = PALPAK_PATH;
+static char g_palpak_video_path[] = PALVIDEO_PATH;
+static palpak_archive_t g_palpak_main = {g_palpak_main_path, 0, 0, 1};
+static palpak_archive_t g_palpak_video = {g_palpak_video_path, 0, 1, -1};
 
 
 int h1pal_pak_last_error(void) { return g_palpak_last_error; }
@@ -698,6 +701,26 @@ static int palpak_path_exists(const char *path)
     return 1;
 }
 
+int h1pal_select_data_path(void)
+{
+    char probe[] = PALPAK_PATH;
+    char drive = 'A';
+    int found = palpak_path_exists(probe);
+    if (!found) {
+        probe[0] = 'B';
+        found = palpak_path_exists(probe);
+        if (found) drive = 'B';
+    }
+    /* Select once, before any shared archive handles or writable files exist.
+     * A present but invalid A archive is reported by its normal reader; do not
+     * silently switch drives and associate it with the other drive's saves. */
+    h1pal_data_path[0] = drive;
+    g_palpak_main_path[0] = drive;
+    g_palpak_video_path[0] = drive;
+    g_palpak_video.available = -1;
+    return found;
+}
+
 static palpak_archive_t *palpak_archive_for_name(const char *name)
 {
     return palpak_is_video_name(name) ? &g_palpak_video : &g_palpak_main;
@@ -890,6 +913,14 @@ FILE *fopen(const char *path, const char *mode)
     stream->packed_size = packed_size;
     stream->packed_position = 0u;
     return stream;
+}
+
+FILE *h1pal_fopen_data(const char *name, const char *mode)
+{
+    char path[128];
+    int length = snprintf(path, sizeof(path), "%s%s", h1pal_data_path, name);
+    if (length < 0 || (unsigned)length >= sizeof(path)) return 0;
+    return fopen(path, mode);
 }
 
 int fclose(FILE *stream)
