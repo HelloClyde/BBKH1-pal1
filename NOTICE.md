@@ -25,14 +25,18 @@ workspace's H1 GBA/Arcade platform implementations (GPL-2.0-or-later, combined
 here under GPL-3.0-or-later). The H1 BDA SDK is Apache-2.0, pinned in
 UPSTREAM.json; its LICENSE and NOTICE remain with the dependency.
 
-Game resources remain under their original proprietary rights. This public
-repository and its Release contain no game PAK, MKF, fonts, AVI, firmware or saves.
-The local-only full installation package can be rebuilt from the user's Steam installation.
+Game resources remain under their original proprietary rights. The source
+repository, source ZIP and program-only install ZIP contain no game PAK, MKF,
+fonts, AVI, firmware or saves. At the user's request, PAL9588.PAK and PALVIDEO.PAK
+are provided as separate Release attachments, rebuilt from the user's Steam
+installation. Their original rights are retained; the source-code GPL license
+does not grant rights to game data. The resource manifest and separate checksums
+identify these attachments. A full local installation package can also be rebuilt.
 Original AVI video retains its decoded pixels and frame rate. The optional
 compact installation package uses the two PAK files the user requested from the
 [9588 v0.1.8 release](https://github.com/HelloClyde/BBK9588-pal1/releases/tag/v0.1.8).
-Those files are excluded from public source and Release archives. No game resource
-packages have been published by this work. Screenshots in docs/evidence show actual
+Compact files are excluded from the public source and program-only install archives.
+Screenshots in docs/evidence show actual
 gameplay for documentation; they are not a grant of rights to the game's artwork.
 
 The service-table model in tests/h1_model.py and tests/mxu_model.py was adapted

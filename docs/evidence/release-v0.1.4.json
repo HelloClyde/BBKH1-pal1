@@ -9,7 +9,6 @@
   "full_firmware_scope": "H1 V1.41 QEMU, desktop icon/title, launch at 480x272, exit with opened=0; exact binary checked before standalone packaging",
   "full_firmware_in_ci": false,
   "hardware_verified": false,
-  "game_resources_published": false,
   "mips_service_model_checks": {
     "wide-ui": {
       "ok": true,
@@ -94,5 +93,7 @@
     "bda_sha256": "0d95916daebcec5f70cac0bca37d9c5804dafac7fe8512aea566f877955ac20b"
   },
   "local_python": "3.11.5",
-  "configured_actions_python": "3.12"
+  "configured_actions_python": "3.12",
+  "game_resources_in_source": false,
+  "resource_release_assets": "separate Steam-original PAK attachments with resources-manifest.json"
 }

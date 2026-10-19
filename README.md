@@ -5,8 +5,9 @@
 
 ## 快速开始
 
-从本项目 Releases 下载 `仙剑1.bda` 或程序安装 ZIP。
-ZIP 只包含程序与说明；游戏资源由使用者从自己拥有的原版准备。
+从本项目 [Releases](https://github.com/HelloClyde/BBKH1-pal1/releases) 下载 `仙剑1.bda` 或程序安装 ZIP。
+程序 ZIP 只包含程序与说明；`PAL9588.PAK` 和 `PALVIDEO.PAK` 作为独立 Release 附件提供，
+也可从自己拥有的原版安装目录生成。两个 PAK 下载后按下列路径放置。
 已有上一版资源的用户只需替换 BDA，存档兼容。
 
 ```text
@@ -30,7 +31,8 @@ python tools/prepare-steam.py --steam-root "D:/SteamLibrary/steamapps/common/PAL
 工具读取 `PAL_DOS` 的 21 项核心数据和 `PAL98` 的六段 AVI，生成两个 PAK。
 AVI 保留原始 288×180、15 fps 画面，只规范容器字段，不再次有损编码。
 也可通过 `tools/palpak.py pack <数据目录> <输出PAK>` 打包，或复用兼容的旧 PAK。
-资源格式与详细来源见 [NOTICE.md](NOTICE.md)。公共仓库和 Release 不包含原版游戏资源、存档或固件。
+资源格式与详细来源见 [NOTICE.md](NOTICE.md)。源码仓库不包含游戏数据包、存档或固件；
+Release 中的独立 PAK 附件保留原游戏资源权利，不属于源码的 GPL 许可。
 
 存档为同目录 `1.rpg`～`5.rpg`，配置为 `sdlpal.cfg`，日志为 `H1PAL.LOG`。
 
@@ -108,6 +110,8 @@ AVI 保留原始 288×180、15 fps 画面，只规范容器字段，不再次有
 在 Windows PowerShell 中执行；每步失败应停止：
 
 ```powershell
+git clone https://github.com/HelloClyde/BBKH1-pal1.git
+cd BBKH1-pal1
 git submodule update --init sdk third_party/sdlpal
 python -m pip install -r requirements.txt
 python tools/install_toolchain.py
