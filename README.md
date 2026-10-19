@@ -95,7 +95,7 @@ AVI 保留原始 288×180、15 fps 画面，只规范容器字段，不再次有
 | 运行 | BBK H1 / Y100 V1.41；使用者自己的仙剑 DOS 核心资源，PAL98 视频可选 |
 | 引擎子模块 | [SDLPAL](https://github.com/sdlpal/sdlpal)，`224cb0a0cc839e0e8ecaa299cd480b02b372b9f7` |
 | SDK 子模块 | [H1 BDA SDK](https://github.com/MrDefinition1999/bbk-h1-bda-sdk)，`067fe072477861dfc8949d7b1a55279fb92d2548`，目录 `sdk/` |
-| 已验证开发环境 | Windows x64，Python 3.12；GNU MIPS little-endian soft-float GCC 15.2.0 |
+| 已验证开发环境 | Windows x64，Python 3.11.5；GNU MIPS little-endian soft-float GCC 15.2.0；Actions 配置为 Python 3.12 |
 | Python | Pillow 12.3.0（图标打包），Unicorn 2.1.4（主机 MIPS 服务模型测试） |
 | 可选资源生成 | FFmpeg（需放入 PATH）；原版游戏安装文件 |
 

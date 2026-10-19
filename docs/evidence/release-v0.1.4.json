@@ -79,5 +79,20 @@
       "leaked_allocations": 0
     }
   },
-  "host_container_tests": 2
+  "host_container_tests": 2,
+  "clean_checkout_build": {
+    "ok": true,
+    "commit": "20652fbd2f1083b9c93d07618139ae2f8b5f5f2b",
+    "submodules_fetched_from_public_remotes": true,
+    "toolchain_archive_sha256": "8ba866e25c9826ee04ab4310365d264e3e73769e3738bb58ae38fd6740b7ee8d",
+    "bda_sha256": "0d95916daebcec5f70cac0bca37d9c5804dafac7fe8512aea566f877955ac20b"
+  },
+  "expanded_source_zip_build": {
+    "ok": true,
+    "dependency_hashes_checked": true,
+    "git_metadata_required": false,
+    "bda_sha256": "0d95916daebcec5f70cac0bca37d9c5804dafac7fe8512aea566f877955ac20b"
+  },
+  "local_python": "3.11.5",
+  "configured_actions_python": "3.12"
 }
