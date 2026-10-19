@@ -1,0 +1,83 @@
+{
+  "version": "0.1.4",
+  "date": "2026-10-20",
+  "bda_sha256": "0d95916daebcec5f70cac0bca37d9c5804dafac7fe8512aea566f877955ac20b",
+  "sdk_commit": "067fe072477861dfc8949d7b1a55279fb92d2548",
+  "sdlpal_commit": "224cb0a0cc839e0e8ecaa299cd480b02b372b9f7",
+  "source_date_epoch": 1792368000,
+  "exact_bda_full_firmware_checked": true,
+  "full_firmware_scope": "H1 V1.41 QEMU, desktop icon/title, launch at 480x272, exit with opened=0; exact binary checked before standalone packaging",
+  "full_firmware_in_ci": false,
+  "hardware_verified": false,
+  "game_resources_published": false,
+  "mips_service_model_checks": {
+    "wide-ui": {
+      "ok": true,
+      "sha256": "0d95916daebcec5f70cac0bca37d9c5804dafac7fe8512aea566f877955ac20b",
+      "fullscreen": [
+        480,
+        272
+      ],
+      "central_status_pixels_identical": true,
+      "title_uniform_cover": true,
+      "portrait_slot_geometry_preserved": true,
+      "uniform_display": "4/3",
+      "backup_restore": true,
+      "icon_at_new_edge": true,
+      "cursor_no_text_overlap": true,
+      "three_modes": true,
+      "clean_exit": true,
+      "seconds": 0.72
+    },
+    "wide-battle": {
+      "ok": true,
+      "sha256": "0d95916daebcec5f70cac0bca37d9c5804dafac7fe8512aea566f877955ac20b",
+      "background_scale": "9/8",
+      "display_scale": "4/3",
+      "fullscreen": [
+        480,
+        272
+      ],
+      "coordinate_grid_verified": true,
+      "four_rle_variants_at_edge": true,
+      "palette_shift": true,
+      "max_wave": true,
+      "modes": 3,
+      "clean_exit": true,
+      "seconds": 1.28
+    },
+    "display-controls": {
+      "ok": true,
+      "cycles": 2,
+      "modes": 3,
+      "fixed_artwork_aspect": true,
+      "engine_canvas_corners": true,
+      "static_redraw": true,
+      "held_key_no_repeat": true,
+      "avi_corners": true,
+      "touch_all_modes": true,
+      "sha256": "0d95916daebcec5f70cac0bca37d9c5804dafac7fe8512aea566f877955ac20b"
+    },
+    "missing": {
+      "ok": true,
+      "kind": "cross-compiled MIPS with modeled H1 services",
+      "missing": true,
+      "stats": [
+        827081040,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "seconds": 0.06,
+      "seeks": 0,
+      "sha256": "0d95916daebcec5f70cac0bca37d9c5804dafac7fe8512aea566f877955ac20b",
+      "leaked_handles": 0,
+      "leaked_allocations": 0
+    }
+  },
+  "host_container_tests": 2
+}

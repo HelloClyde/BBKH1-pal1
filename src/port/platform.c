@@ -1,0 +1,109 @@
+/* Native H1/Y100 V1.41 display, clock and input. GPL-3.0-or-later. */
+#include "platform.h"
+#include "h1_sdk.h"
+#include "game_input.h"
+#include "touch.h"
+#include "app.h"
+#include "pal_config.h"
+#include "wide_scene.h"
+#include <stdio.h>
+#include <string.h>
+static int opened,timer,closing,display_mode,v_held;
+static volatile uint32_t *lcd;
+static const SDL_Surface *last_surface;
+static unsigned sampled,latched,combo_started;
+static int combo;
+static int touch_active,touch_x,touch_y,touch_last_x,touch_last_y,touch_moved;
+static unsigned touch_started,tap_time;
+static int tap_pending,tap_x,tap_y;
+/* A 360x204 map scales uniformly by 4/3 to 480x272. Legacy fixed pictures
+ * keep their aspect ratio. V cycles extended map / original view / native. */
+static unsigned width=435,height=272,left=22,top=0;
+static unsigned logical_width=320,logical_height=200;
+static int extended_map,map_full;
+static uint16_t xmap[480],ymap[272];
+static void *gui(unsigned o){return h1_runtime_entry(h1_runtime_table(H1_RUNTIME_GUI_TABLE_SLOT),o);}
+static int down(unsigned k){return h1_game_code_down(h1_game_key_code(k));}
+static void geometry(void){
+ map_full=extended_map&&display_mode==0;
+ logical_width=map_full?H1PAL_MAP_WIDTH:320;logical_height=map_full?H1PAL_MAP_HEIGHT:200;
+ width=map_full?480:(display_mode==2?320:435);height=display_mode==2?200:272;left=(480-width)/2;top=(272-height)/2;
+ for(unsigned x=0;x<width;++x)xmap[x]=x*logical_width/width;
+ for(unsigned y=0;y<height;++y)ymap[y]=y*logical_height/height;
+ if(lcd)for(unsigned i=0;i<480*272;++i)lcd[i]=0;
+}
+int h1pal_platform_open(void){
+ if(opened)return 1;
+ typedef int(*open_fn)(void);typedef volatile uint32_t*(*buffer_fn)(uint16_t*,void*);
+ open_fn fn=(open_fn)gui(0x84c);if(!fn||!fn())return 0;opened=1;
+ uint16_t info[6]={0};buffer_fn get=(buffer_fn)gui(0x8f4);lcd=get?get(info,0):0;
+ if(!lcd||info[1]!=480||info[2]!=272||info[3]!=1920||info[5]!=32){h1pal_stats.error=11;h1pal_platform_close();return 0;}
+ h1_timer_start();timer=1;geometry();h1pal_log("VIDEO 480x272 stride=1920 bpp=32 lcd=%p",(void*)lcd);return 1;
+}
+void h1pal_platform_close(void){
+ if(timer){h1_timer_stop();timer=0;}
+ if(opened){typedef int(*fn)(void);fn close=(fn)gui(0x850);if(close)close();opened=0;}lcd=0;last_surface=0;
+}
+Uint32 h1pal_platform_ticks(void){return timer?h1_timer_read_ms():0;}
+void h1pal_platform_delay(Uint32 ms){unsigned start=h1pal_platform_ticks();while(timer&&(unsigned)(h1pal_platform_ticks()-start)<ms)h1pal_platform_pump();}
+void h1pal_platform_present(const SDL_Surface *s){
+ if(!lcd||!s||!s->pixels||!s->format||!s->format->palette||s->w!=320||s->h!=200)return;
+ last_surface=s;
+ const Uint8 *wide=h1pal_scene_pixels(s);
+ if(extended_map!=!!wide){extended_map=!!wide;geometry();}
+ uint32_t palette[256];for(unsigned i=0;i<256;++i){SDL_Color c=s->format->palette->colors[i];palette[i]=(c.r<<16)|(c.g<<8)|c.b;}
+ SDL_H1AudioPump();
+ for(unsigned y=0;y<height;++y){volatile uint32_t *out=lcd+(top+y)*480+left;
+ if(map_full){unsigned sy=ymap[y];const Uint8 *in=wide+sy*H1PAL_MAP_WIDTH;
+ for(unsigned x=0;x<width;++x){unsigned sx=xmap[x];Uint8 c=in[sx];
+ if(sx>=H1PAL_MAP_LEFT&&sx<H1PAL_MAP_LEFT+320&&sy>=H1PAL_MAP_TOP&&sy<H1PAL_MAP_TOP+200)
+ c=((const Uint8*)s->pixels)[(sy-H1PAL_MAP_TOP)*s->pitch+sx-H1PAL_MAP_LEFT];out[x]=palette[c];}}
+ else{const Uint8 *in=(const Uint8*)s->pixels+ymap[y]*s->pitch;for(unsigned x=0;x<width;++x)out[x]=palette[in[xmap[x]]];}}
+ ++h1pal_stats.frames;SDL_H1AudioPump();
+}
+void h1pal_platform_present_rgb555(const Uint16 *pixels,int w,int h,int pitch){
+ if(!lcd||!pixels||w<1||h<1||pitch<w)return;last_surface=0;SDL_H1AudioPump();
+ if(extended_map){extended_map=0;geometry();}
+ for(unsigned y=0;y<height;++y){const uint16_t *in=pixels+(y*(unsigned)h/height)*pitch;volatile uint32_t *out=lcd+(top+y)*480+left;
+ for(unsigned x=0;x<width;++x){unsigned c=in[x*(unsigned)w/width],r=(c>>10)&31,g=(c>>5)&31,b=c&31;out[x]=(((r<<3)|(r>>2))<<16)|(((g<<3)|(g>>2))<<8)|(b<<3)|(b>>2);}}
+ ++h1pal_stats.frames;SDL_H1AudioPump();
+}
+static int absolute(int n){return n<0?-n:n;}
+static void touch_event(int event){
+ int x,y;if(event!=11&&!touch_active)return;
+ if(h1_touch_position(&x,&y)){touch_last_x=x;touch_last_y=y;}else if(event==11)return;
+ x=touch_last_x;y=touch_last_y;unsigned now=h1pal_platform_ticks();
+ if(event==11){touch_active=1;touch_x=x;touch_y=y;touch_started=now;touch_moved=0;}
+ else{if(absolute(x-touch_x)>18||absolute(y-touch_y)>18)touch_moved=1;
+ if(event==8){if(!touch_moved&&now-touch_started<=750&&x>=(int)left&&y>=(int)top&&x<(int)(left+width)&&y<(int)(top+height)){
+ tap_x=(x-left)*(int)logical_width/(int)width-(map_full?H1PAL_MAP_LEFT:0);
+ tap_y=(y-top)*(int)logical_height/(int)height-(map_full?H1PAL_MAP_TOP:0);tap_pending=1;tap_time=now;++h1pal_stats.taps;}touch_active=0;}}
+}
+void h1pal_platform_pump(void){
+ if(!opened)return;
+ for(unsigned i=0;i<32;++i){int event=-1,value=-1;h1_event_fetch(&event,&value);if(event==-1&&value==-1)break;
+ if(event==11||event==12||event==8)touch_event(event);
+ if(event==H1_EVENT_KEY_DOWN){++h1pal_stats.keys;if(value==H1_KEY_BACK)closing=1;
+ unsigned bit=0;switch(value){case H1_KEY_UP:bit=1;break;case H1_KEY_DOWN:bit=2;break;case H1_KEY_LEFT:bit=4;break;case H1_KEY_RIGHT:bit=8;break;
+ case H1_KEY_ENTER:case H1_KEY_CONFIRM:case H1_KEY_Z:case H1_KEY_SPACE:bit=16;break;case H1_KEY_ESCAPE:case H1_KEY_X:bit=32;break;}latched|=bit;}}
+ if(touch_active)touch_event(12);
+ int v=down(H1_KEY_V);
+ if(v&&!v_held){display_mode=(display_mode+1)%3;geometry();if(last_surface)h1pal_platform_present(last_surface);}
+ v_held=v;
+ unsigned keys=(down(H1_KEY_UP)?1:0)|(down(H1_KEY_DOWN)?2:0)|(down(H1_KEY_LEFT)?4:0)|(down(H1_KEY_RIGHT)?8:0)|((down(H1_KEY_ENTER)||down(H1_KEY_Z)||down(H1_KEY_SPACE))?16:0)|((down(H1_KEY_ESCAPE)||down(H1_KEY_X))?32:0);
+ latched|=keys&~sampled;sampled=keys;
+ if((keys&48)==48){if(!combo){combo=1;combo_started=h1pal_platform_ticks();}else if(h1pal_platform_ticks()-combo_started>=1500)closing=1;}else combo=0;
+}
+unsigned h1pal_platform_keys(void){h1pal_platform_pump();unsigned keys=sampled|latched;latched=0;return keys;}
+int h1pal_platform_detached(void){return closing;}
+int h1pal_platform_take_tap(int *x,int *y){if(!tap_pending)return 0;tap_pending=0;if(h1pal_platform_ticks()-tap_time>500)return 0;*x=tap_x;*y=tap_y;return 1;}
+void h1pal_platform_wait_action_release(void){
+ unsigned quiet=h1pal_platform_ticks();
+ do{h1pal_platform_pump();SDL_H1AudioPump();if(sampled&48)quiet=h1pal_platform_ticks();}
+ while(!closing&&h1pal_platform_ticks()-quiet<120);
+ latched=0;
+}
+void H1PAL_FatalOutput(const char *message){
+ h1pal_stats.error=1;h1pal_log("FATAL %s",message?message:"");h1pal_platform_close();
+ h1_message_box(0,"\xCE\xDE\xB7\xA8\xB6\xC1\xC8\xA1\xCF\xC9\xBD\xA3\xD7\xCA\xD4\xB4\xA1\xA3\nA:\\\xD3\xA6\xD3\xC3\\\xCA\xFD\xBE\xDD\\PAL\\PAL9588.PAK","\xCF\xC9\xBD\xA3 1",0);
+}

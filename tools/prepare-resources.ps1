@@ -1,0 +1,96 @@
+[CmdletBinding()]
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$OriginalPack,
+    [string]$Output,
+    [string]$VideoOutput
+)
+
+$ErrorActionPreference = 'Stop'
+$repoRoot = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
+$buildRoot = Join-Path $repoRoot 'build'
+$unpacked = Join-Path $buildRoot 'pal-original-unpacked'
+$compactVideo = Join-Path $buildRoot 'pal98-compact'
+$ready = Join-Path $buildRoot 'pal9588-ready'
+$videoReady = Join-Path $buildRoot 'pal9588-video-ready'
+if (-not $Output) { $Output = Join-Path $buildRoot 'PAL9588.PAK' }
+if (-not $VideoOutput) { $VideoOutput = Join-Path $buildRoot 'PALVIDEO.PAK' }
+$outputPath = [IO.Path]::GetFullPath($Output)
+$videoOutputPath = [IO.Path]::GetFullPath($VideoOutput)
+if ([string]::Equals(
+        $outputPath, $videoOutputPath,
+        [StringComparison]::OrdinalIgnoreCase
+    )) {
+    throw '主资源包和视频资源包不能使用同一个输出路径。'
+}
+$python = (Get-Command python -ErrorAction Stop).Source
+
+function Reset-BuildDirectory([string]$Path) {
+    $resolved = [IO.Path]::GetFullPath($Path)
+    $prefix = [IO.Path]::GetFullPath($buildRoot).TrimEnd('\') + '\'
+    if (-not $resolved.StartsWith(
+        $prefix, [StringComparison]::OrdinalIgnoreCase
+    )) {
+        throw "拒绝清理 build 之外的目录：$resolved"
+    }
+    if (Test-Path -LiteralPath $resolved) {
+        Remove-Item -LiteralPath $resolved -Recurse -Force
+    }
+    New-Item -ItemType Directory -Path $resolved -Force | Out-Null
+}
+
+    $originalPath = (Resolve-Path -LiteralPath $OriginalPack).Path
+    Reset-BuildDirectory $unpacked
+    Reset-BuildDirectory $compactVideo
+    Reset-BuildDirectory $ready
+    Reset-BuildDirectory $videoReady
+
+    & $python -S (Join-Path $PSScriptRoot 'palpak.py') `
+        extract $originalPath $unpacked
+    if ($LASTEXITCODE -ne 0) { throw '原始资源包展开失败' }
+    & (Join-Path $PSScriptRoot 'check-resources.ps1') $unpacked
+
+    & (Join-Path $PSScriptRoot 'transcode-avi.ps1') `
+        $unpacked $compactVideo
+    if ($LASTEXITCODE -ne 0) { throw 'AVI 离线转换失败' }
+
+    Get-ChildItem -LiteralPath $unpacked -File | Where-Object {
+        $_.Extension -ine '.avi'
+    } | ForEach-Object {
+        Copy-Item -LiteralPath $_.FullName -Destination (
+            Join-Path $ready $_.Name
+        )
+    }
+    1..6 | ForEach-Object {
+        $video = Join-Path $compactVideo "$_.avi"
+        if (-not (Test-Path -LiteralPath $video -PathType Leaf)) {
+            throw "转换后视频缺失：$video"
+        }
+        Copy-Item -LiteralPath $video -Destination (
+            Join-Path $videoReady "$_.avi"
+        )
+    }
+
+    & (Join-Path $PSScriptRoot 'check-resources.ps1') $ready
+    & $python -S (Join-Path $PSScriptRoot 'palpak.py') pack $ready $outputPath
+    if ($LASTEXITCODE -ne 0) { throw 'H1/9588 主资源包创建失败' }
+    & $python -S (Join-Path $PSScriptRoot 'palpak.py') verify $outputPath
+    if ($LASTEXITCODE -ne 0) { throw 'H1/9588 主资源包校验失败' }
+
+    & $python -S (Join-Path $PSScriptRoot 'palpak.py') `
+        pack $videoReady $videoOutputPath
+    if ($LASTEXITCODE -ne 0) { throw 'H1/9588 视频资源包创建失败' }
+    & $python -S (Join-Path $PSScriptRoot 'palpak.py') verify $videoOutputPath
+    if ($LASTEXITCODE -ne 0) { throw 'H1/9588 视频资源包校验失败' }
+
+    $file = Get-Item -LiteralPath $outputPath
+    $hash = Get-FileHash -LiteralPath $outputPath -Algorithm SHA256
+    Write-Host "H1/9588 主资源包：$($file.FullName)"
+    Write-Host "大小：$($file.Length) bytes"
+    Write-Host "SHA-256：$($hash.Hash)"
+
+    $videoFile = Get-Item -LiteralPath $videoOutputPath
+    $videoHash = Get-FileHash -LiteralPath $videoOutputPath -Algorithm SHA256
+    Write-Host "H1/9588 可选视频包：$($videoFile.FullName)"
+    Write-Host "大小：$($videoFile.Length) bytes"
+    Write-Host "SHA-256：$($videoHash.Hash)"

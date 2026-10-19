@@ -1,0 +1,15 @@
+/build/
+/dist/
+/.tools/
+__pycache__/
+*.pyc
+*.PAK
+*.pak
+*.rpg
+*.RPG
+*.raw
+*.nand
+*.bda
+*.BDA
+*.elf
+*.o

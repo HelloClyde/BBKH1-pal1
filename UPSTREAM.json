@@ -1,0 +1,17 @@
+{
+  "sdlpal": {
+    "url": "https://github.com/sdlpal/sdlpal.git",
+    "commit": "224cb0a0cc839e0e8ecaa299cd480b02b372b9f7",
+    "path": "third_party/sdlpal"
+  },
+  "h1-sdk": {
+    "url": "https://github.com/MrDefinition1999/bbk-h1-bda-sdk.git",
+    "commit": "067fe072477861dfc8949d7b1a55279fb92d2548",
+    "path": "sdk"
+  },
+  "9588-reference": {
+    "url": "https://github.com/HelloClyde/BBK9588-pal1.git",
+    "commit": "10532f74ced55061b6147538dee80797527fb203",
+    "usage": "GPL-3.0-or-later compatibility layer, PAK reader, AVI bridge and pathfinding adapted in src; no 9588 SDK or firmware services are linked"
+  }
+}

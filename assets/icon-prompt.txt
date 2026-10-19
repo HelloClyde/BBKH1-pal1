@@ -1,0 +1,8 @@
+Use case: style-transfer.
+Asset type: one final BBK H1 handheld desktop application icon for 仙剑1, square PNG with actual transparent exterior.
+Input images: Image 1 is the edit target and identity reference: the existing red calligraphic Chinese 仙 symbol on a pale pink rounded tile. Image 2 is a style reference ONLY: an actual 480x272 BBK H1 desktop screenshot showing native glossy, softly beveled, rounded square icons.
+Primary request: redesign Image 1 to belong naturally among Image 2's native H1 icons, while keeping the unmistakable red brush-written 仙 as the main subject. Preserve the character's stroke structure and visual identity closely. Improve the original icon's polish, proportion, lighting and tiny-size clarity.
+Style: compact early handheld skeuomorphic icon, gently convex glossy enamel/glass, ivory-white to very pale blush face, restrained warm red edging, a soft upper highlight and subtle bevel, red calligraphy with shallow embossed depth. Faithful to the H1 screenshot's simple clean 3D icon language; restrained highlights.
+Composition: straight-on, one centered rounded square tile occupying about 92% of the square canvas, no perspective skew. The red 仙 should occupy about 72% of the tile width, with comfortable clear space. Use broad bold readable strokes and simple surfaces that survive reduction to 45x45 and 57x57 pixels.
+Text (verbatim): only the single large Chinese character "仙". No additional text or app label.
+Constraints: preserve the red 仙 subject, keep transparent outside the rounded tile, one icon only, no desktop background, no sheet of variants, no people, no added swords or ornaments, no watermark. Real alpha transparency, no checkerboard baked into image.

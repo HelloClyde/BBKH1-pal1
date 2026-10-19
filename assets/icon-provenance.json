@@ -1,0 +1,18 @@
+{
+  "date": "2026-10-20",
+  "mode": "built-in image_gen",
+  "use_case": "style-transfer",
+  "source_subject": "HelloClyde/BBK9588-pal1 red calligraphic 仙 icon, retained as icon-v0.1.4.png",
+  "style_reference": "assets/h1-desktop-reference.png (actual H1 V1.41 desktop screenshot)",
+  "prompt": "icon-prompt.txt",
+  "generated_source": "exec-29e43a77-c9a3-42c2-949d-801f00346c26.png",
+  "workspace_master": "icon-h1-gpt.png",
+  "active": "icon.png",
+  "sha256": "b1f14bafea9234d005b293459f169cf862de04d174ab8eb17f8920690b245547",
+  "dimensions": [
+    1254,
+    1254
+  ],
+  "alpha_preserved": true,
+  "postprocessing": "None on master; SDK uniformly downsizes to its four fixed icon resources."
+}
