@@ -71,15 +71,16 @@ assert frame(scene)==shifted and data(scene)==crop(shifted)
 m.write(g+gf['wScreenWave'],struct.pack('<H',255));call('h1pal_battle_make_background')
 assert len(frame(scene))==360*204
 call('h1pal_platform_present',scene)
-# Mode changes still redraw a static battle immediately.
-for mode,width in ((1,435),(2,320),(0,480)):
-    m.physical_keys.add(19);call('h1pal_platform_pump');m.physical_keys.clear();call('h1pal_platform_pump')
-    assert word(m.meta['symbols']['width'])==width
+# Unused letter keys cannot change a full-screen UI/battle.
+for key in (16,17,19,23):
+    m.physical_keys.add(key);call('h1pal_platform_pump')
+    assert word(m.meta['symbols']['width'])==480
+    m.physical_keys.clear();call('h1pal_platform_pump')
 m.word(g+gf['fInBattle'],0)
 assert call('h1pal_scene_pixels',scene)==0,'stale battle margins outside combat'
 call('SDL_FreeSurface',scene);call('SDL_FreeSurface',bg);call('h1pal_scene_shutdown');call('h1pal_platform_close')
 assert not m.allocations and not m.handles
 r={'ok':True,'sha256':m.meta['sha256'],'background_scale':'9/8','display_scale':'4/3',
    'fullscreen':[480,272],'coordinate_grid_verified':True,'four_rle_variants_at_edge':True,
-   'palette_shift':True,'max_wave':True,'modes':3,'clean_exit':True,'seconds':round(time.monotonic()-started,2)}
+   'palette_shift':True,'max_wave':True,'fixed_fullscreen':True,'clean_exit':True,'seconds':round(time.monotonic()-started,2)}
 (ROOT/'build/verification/wide-battle.json').write_text(json.dumps(r,indent=2)+'\n');print(json.dumps(r,indent=2))

@@ -8,16 +8,15 @@
 #include "wide_scene.h"
 #include <stdio.h>
 #include <string.h>
-static int opened,timer,closing,display_mode,v_held;
+static int opened,timer,closing;
 static volatile uint32_t *lcd;
-static const SDL_Surface *last_surface;
 static unsigned sampled,latched,combo_started;
 static int combo;
 static int touch_active,touch_x,touch_y,touch_last_x,touch_last_y,touch_moved;
 static unsigned touch_started,tap_time;
 static int tap_pending,tap_x,tap_y;
 /* A 360x204 map scales uniformly by 4/3 to 480x272. Legacy fixed pictures
- * keep their aspect ratio. V cycles extended map / original view / native. */
+ * and AVI keep their aspect ratio. Display geometry has no keyboard toggle. */
 static unsigned width=435,height=272,left=22,top=0;
 static unsigned logical_width=320,logical_height=200;
 static int extended_map,map_full;
@@ -25,9 +24,9 @@ static uint16_t xmap[480],ymap[272];
 static void *gui(unsigned o){return h1_runtime_entry(h1_runtime_table(H1_RUNTIME_GUI_TABLE_SLOT),o);}
 static int down(unsigned k){return h1_game_code_down(h1_game_key_code(k));}
 static void geometry(void){
- map_full=extended_map&&display_mode==0;
+ map_full=extended_map;
  logical_width=map_full?H1PAL_MAP_WIDTH:320;logical_height=map_full?H1PAL_MAP_HEIGHT:200;
- width=map_full?480:(display_mode==2?320:435);height=display_mode==2?200:272;left=(480-width)/2;top=(272-height)/2;
+ width=map_full?480:435;height=272;left=(480-width)/2;top=0;
  for(unsigned x=0;x<width;++x)xmap[x]=x*logical_width/width;
  for(unsigned y=0;y<height;++y)ymap[y]=y*logical_height/height;
  if(lcd)for(unsigned i=0;i<480*272;++i)lcd[i]=0;
@@ -42,13 +41,12 @@ int h1pal_platform_open(void){
 }
 void h1pal_platform_close(void){
  if(timer){h1_timer_stop();timer=0;}
- if(opened){typedef int(*fn)(void);fn close=(fn)gui(0x850);if(close)close();opened=0;}lcd=0;last_surface=0;
+ if(opened){typedef int(*fn)(void);fn close=(fn)gui(0x850);if(close)close();opened=0;}lcd=0;
 }
 Uint32 h1pal_platform_ticks(void){return timer?h1_timer_read_ms():0;}
 void h1pal_platform_delay(Uint32 ms){unsigned start=h1pal_platform_ticks();while(timer&&(unsigned)(h1pal_platform_ticks()-start)<ms)h1pal_platform_pump();}
 void h1pal_platform_present(const SDL_Surface *s){
  if(!lcd||!s||!s->pixels||!s->format||!s->format->palette||s->w!=320||s->h!=200)return;
- last_surface=s;
  const Uint8 *wide=h1pal_scene_pixels(s);
  if(extended_map!=!!wide){extended_map=!!wide;geometry();}
  uint32_t palette[256];for(unsigned i=0;i<256;++i){SDL_Color c=s->format->palette->colors[i];palette[i]=(c.r<<16)|(c.g<<8)|c.b;}
@@ -62,7 +60,7 @@ void h1pal_platform_present(const SDL_Surface *s){
  ++h1pal_stats.frames;SDL_H1AudioPump();
 }
 void h1pal_platform_present_rgb555(const Uint16 *pixels,int w,int h,int pitch){
- if(!lcd||!pixels||w<1||h<1||pitch<w)return;last_surface=0;SDL_H1AudioPump();
+ if(!lcd||!pixels||w<1||h<1||pitch<w)return;SDL_H1AudioPump();
  if(extended_map){extended_map=0;geometry();}
  for(unsigned y=0;y<height;++y){const uint16_t *in=pixels+(y*(unsigned)h/height)*pitch;volatile uint32_t *out=lcd+(top+y)*480+left;
  for(unsigned x=0;x<width;++x){unsigned c=in[x*(unsigned)w/width],r=(c>>10)&31,g=(c>>5)&31,b=c&31;out[x]=(((r<<3)|(r>>2))<<16)|(((g<<3)|(g>>2))<<8)|(b<<3)|(b>>2);}}
@@ -85,12 +83,9 @@ void h1pal_platform_pump(void){
  if(event==11||event==12||event==8)touch_event(event);
  if(event==H1_EVENT_KEY_DOWN){++h1pal_stats.keys;if(value==H1_KEY_BACK)closing=1;
  unsigned bit=0;switch(value){case H1_KEY_UP:bit=1;break;case H1_KEY_DOWN:bit=2;break;case H1_KEY_LEFT:bit=4;break;case H1_KEY_RIGHT:bit=8;break;
- case H1_KEY_ENTER:case H1_KEY_CONFIRM:case H1_KEY_Z:case H1_KEY_SPACE:bit=16;break;case H1_KEY_ESCAPE:case H1_KEY_X:bit=32;break;}latched|=bit;}}
+ case H1_KEY_ENTER:case H1_KEY_CONFIRM:bit=16;break;case H1_KEY_ESCAPE:bit=32;break;}latched|=bit;}}
  if(touch_active)touch_event(12);
- int v=down(H1_KEY_V);
- if(v&&!v_held){display_mode=(display_mode+1)%3;geometry();if(last_surface)h1pal_platform_present(last_surface);}
- v_held=v;
- unsigned keys=(down(H1_KEY_UP)?1:0)|(down(H1_KEY_DOWN)?2:0)|(down(H1_KEY_LEFT)?4:0)|(down(H1_KEY_RIGHT)?8:0)|((down(H1_KEY_ENTER)||down(H1_KEY_Z)||down(H1_KEY_SPACE))?16:0)|((down(H1_KEY_ESCAPE)||down(H1_KEY_X))?32:0);
+ unsigned keys=(down(H1_KEY_UP)?1:0)|(down(H1_KEY_DOWN)?2:0)|(down(H1_KEY_LEFT)?4:0)|(down(H1_KEY_RIGHT)?8:0)|(down(H1_KEY_ENTER)?16:0)|(down(H1_KEY_ESCAPE)?32:0);
  latched|=keys&~sampled;sampled=keys;
  if((keys&48)==48){if(!combo){combo=1;combo_started=h1pal_platform_ticks();}else if(h1pal_platform_ticks()-combo_started>=1500)closing=1;}else combo=0;
 }

@@ -58,12 +58,14 @@ for text_x,text_y in ((35,54),(15,12),(122,72),(215,90)):
     assert len(white)==16 and min(x for x,y in white)==text_x-6 and max(x for x,y in white)==text_x-3
     assert min(y for x,y in white)==text_y+4 and max(y for x,y in white)==text_y+10
     assert all(image[y*320+x]==17 for y in range(text_y,text_y+16) for x in range(text_x,text_x+80)),'cursor overlapped text'
-for width in (435,320,480):
-    m.physical_keys.add(19);call('h1pal_platform_pump');m.physical_keys.clear();call('h1pal_platform_pump')
-    assert word(m.meta['symbols']['width'])==width
+# Unused letter keys cannot change a full-screen UI/battle.
+for key in (16,17,19,23):
+    m.physical_keys.add(key);call('h1pal_platform_pump')
+    assert word(m.meta['symbols']['width'])==480
+    m.physical_keys.clear();call('h1pal_platform_pump')
 call('SDL_FreeSurface',backup);call('SDL_FreeSurface',s);call('h1pal_scene_shutdown');call('h1pal_platform_close')
 assert not m.allocations and not m.handles
 r={'ok':True,'sha256':m.meta['sha256'],'fullscreen':[480,272],'central_status_pixels_identical':True,
    'title_uniform_cover':True,'portrait_slot_geometry_preserved':True,'uniform_display':'4/3',
-   'backup_restore':True,'icon_at_new_edge':True,'cursor_no_text_overlap':True,'three_modes':True,'clean_exit':True,'seconds':round(time.monotonic()-start,2)}
+   'backup_restore':True,'icon_at_new_edge':True,'cursor_no_text_overlap':True,'fixed_fullscreen':True,'clean_exit':True,'seconds':round(time.monotonic()-start,2)}
 (ROOT/'build/verification/wide-ui.json').write_text(json.dumps(r,indent=2)+'\n');print(json.dumps(r,indent=2))

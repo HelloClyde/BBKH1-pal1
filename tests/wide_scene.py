@@ -31,7 +31,7 @@ def checkpoint(uc, address, size, user):
         if phase in (13, 16, 19): m.physical_keys.add(19)
         else: m.physical_keys.clear()
         if phase in (11, 14, 17, 20):
-            touch[:] = {11: (479, 271), 14: (456, 271), 17: (399, 235), 20: (0, 0)}[phase]
+            touch[:] = {11: (479, 271), 14: (0, 0), 17: (240, 136), 20: (0, 0)}[phase]
             m.events.extend([(11, 0), (8, 0)])
         return
     screen = word(m.meta['symbols']['gpScreen'])
@@ -69,7 +69,7 @@ shots[1]['wide'].save(out/'expanded-map-indices.png')
 report = {'ok': True, 'sha256': m.meta['sha256'], 'logical_map': [360, 204],
           'uniform_scale': '4/3', 'legacy_crop_identical': True, 'world_state_unchanged': True,
           'menu_restore_identical': True, 'partial_ui_refresh': True, 'outside_npc_drawn': True, 'max_wave_rendered': True,
-          'touch_all_modes_and_new_edges': True, 'uniform_pixels_verified': True, 'battle_margins_cleared': True,
+          'touch_fullscreen_and_new_edges': True, 'uniform_pixels_verified': True, 'battle_margins_cleared': True,
           'seconds': round(time.monotonic()-started, 2), 'log': log,
           'leaked_allocations': len(m.allocations), 'leaked_handles': len(m.handles)}
 (out/'wide-scene.json').write_text(json.dumps(report, indent=2)+'\n')

@@ -274,7 +274,7 @@ static void run_view_regression(void)
      * checkpoints. Coordinates may be negative relative to the old view. */
     for (i = 0; i < 3; ++i) {
         int x, y;
-        int expected_x[] = {339, 319, 319}, expected_y[] = {201, 199, 199};
+        int expected_x[] = {339, -20, 160}, expected_y[] = {201, -2, 100};
         h1pal_view_checkpoint(10 + i * 3);
         h1pal_platform_pump();
         h1pal_view_checkpoint(11 + i * 3);

@@ -1,4 +1,4 @@
-"""Check native V edges and immediate static-screen redraw with real MIPS code."""
+"""Check the six game controls, ignored shortcuts and fixed display geometry."""
 from pathlib import Path
 import importlib.util,json,struct
 ROOT=Path(__file__).resolve().parents[1]
@@ -21,36 +21,42 @@ m.write(surface,struct.pack('<IIIIH2xI',0,fmt,320,200,320,pixels)+bytes(64))
 m.write(pixels,bytes(320*200));call('h1pal_platform_present',surface)
 def pixel(x,y):return struct.unpack('<I',m.read(0x82000000+(y*480+x)*4,4))[0]
 assert pixel(0,0)==0 and pixel(22,0)==0xff0000 and pixel(456,271)==0xff0000 and pixel(457,271)==0,'fixed artwork must preserve aspect ratio'
-def v():
-    m.physical_keys.add(19);call('h1pal_platform_pump')
-def release():
-    m.physical_keys.clear();call('h1pal_platform_pump')
-for cycle in range(2):
-    v()
-    assert pixel(0,0)==0 and pixel(22,0)==0xff0000
-    call('h1pal_platform_pump');assert pixel(0,0)==0,'held V must not repeat'
-    release();v()
-    assert pixel(22,0)==0 and pixel(80,36)==0xff0000
-    release();v()
-    assert pixel(0,0)==0 and pixel(22,0)==0xff0000 and pixel(456,271)==0xff0000
-    release()
+# Query native scancodes independently of the model's matrix table.
+# Both event and held paths ignore all letter/space shortcuts.
+query=m.game_key
+raw_keys=set()
+def raw_query(code,*args):return int(code in raw_keys)
+for address,callback in list(m.callbacks.items()):
+    if callback==query:m.callbacks[address]=raw_query
+for raw,bit in ((103,1),(108,2),(105,4),(106,8),(28,16),(1,32)):
+    raw_keys.add(raw);assert call('h1pal_platform_keys')==bit
+    call('h1pal_platform_keys');assert call('h1pal_platform_keys')==bit
+    raw_keys.clear();assert call('h1pal_platform_keys')==0
+for raw,matrix in ((44,16),(45,17),(47,19),(57,23)):
+    before=m.read(0x82000000,480*272*4)
+    raw_keys.add(raw);m.events.extend([(9,matrix),(10,matrix)])
+    for _ in range(4):
+        m.ticks+=500;assert call('h1pal_platform_keys')==0
+    assert m.read(0x82000000,480*272*4)==before,'unused key changed display'
+    raw_keys.clear();assert call('h1pal_platform_keys')==0
+for address,callback in list(m.callbacks.items()):
+    if callback==raw_query:m.callbacks[address]=query
 # AVI uses the same screen geometry, including the right/bottom endpoints.
 m.write(pixels,struct.pack('<4H',0x7c00,0x03e0,0x001f,0x7fff))
 call('h1pal_platform_present_rgb555',pixels,2,2,2)
 assert [pixel(x,y) for x,y in ((22,0),(456,0),(22,271),(456,271))]==[0xff0000,0x00ff00,0x0000ff,0xffffff]
 assert pixel(0,0)==0 and pixel(479,271)==0
-# Tap inversion must agree with the selected viewport in all three modes.
+# Tap inversion must agree with fixed artwork geometry.
 touch=[0,0]
 def get_touch(x,y,*a):
     m.write(x,struct.pack('<H',touch[0]));m.write(y,struct.pack('<H',touch[1]))
     m.uc.reg_write(UC_MIPS_REG_PC,m.uc.reg_read(UC_MIPS_REG_RA));return 0
 fn=0x80001b80;m.callbacks[fn]=get_touch;m.word(0x80002000+0x6c0,fn)
 m.write(fn,struct.pack('<6I',0x27bdffa8,0xafbf0050,0,0,0x00a0b821,0x0080b021))
-for w,h,left,top in ((435,272,22,0),(435,272,22,0),(320,200,80,36)):
+for w,h,left,top in ((435,272,22,0),):
     touch[:]=[left+w-1,top+h-1];m.events.extend([(11,0),(8,0)]);call('h1pal_platform_pump')
     assert call('h1pal_platform_take_tap',surface,surface+4)==1
     assert struct.unpack('<2I',m.read(surface,8))==((w-1)*320//w,(h-1)*200//h)
-    v();release()
 # Exercise the engine-to-SDL path too: the game's whole 320x200 canvas must
 # reach the whole LCD, including when the legacy SDL 1.x scaler is involved.
 assert call('VIDEO_Startup')==0
@@ -65,5 +71,5 @@ assert all(pixel(x,y)==0xffffff for x,y in ((22,0),(456,0),(22,271),(456,271))),
 call('VIDEO_Shutdown')
 call('h1pal_platform_close');assert not m.gui_active and not m.handles
 assert not m.allocations
-r={'ok':True,'cycles':2,'modes':3,'fixed_artwork_aspect':True,'engine_canvas_corners':True,'static_redraw':True,'held_key_no_repeat':True,'avi_corners':True,'touch_all_modes':True,'sha256':m.meta['sha256']}
+r={'ok':True,'six_controls':True,'letter_space_shortcuts_ignored':True,'fixed_artwork_aspect':True,'engine_canvas_corners':True,'avi_corners':True,'touch_coordinates':True,'sha256':m.meta['sha256']}
 (ROOT/'build/verification/display-controls.json').write_text(json.dumps(r,indent=2)+'\n');print(json.dumps(r,indent=2))

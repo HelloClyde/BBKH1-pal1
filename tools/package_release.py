@@ -80,7 +80,7 @@ def main():
     if args.tag:assert args.tag=='v'+version
     deps={k:v for k,v in read(ROOT/'UPSTREAM.json').items() if 'path' in v}
     reports={}
-    for name in ('release','wide-ui','wide-battle','display-controls','missing','data-drives'):
+    for name in ('release','wide-ui','wide-battle','display-controls','music','missing','data-drives'):
         r=read(ROOT/f'build/verification/{name}.json');assert r['ok'] and r['sha256']==meta['sha256'];reports[name]=r
     for name,digest in meta['sources'].items():assert sha((ROOT/name).read_bytes())==digest,'Rebuild after source changes: '+name
     out.mkdir(parents=True,exist_ok=True)
@@ -90,7 +90,7 @@ def main():
     (out/'RELEASE-NOTES.md').write_bytes((ROOT/f'docs/release-v{version}.md').read_bytes())
     manifest={'version':version,'application_commit':commit,'dependencies':deps,'bda_sha256':meta['sha256'],
         'full_firmware_in_ci':False,'hardware_verified':False,'exact_bda_full_firmware_checked':True,
-        'full_firmware_scope':'H1 V1.41 launch/load/exit on A; A/B priority, same-volume I/O and real B save roundtrip in MIPS service model',
+        'full_firmware_scope':'H1 V1.41 launch/load, six controls, ignored Z/X/V/space, map BGM PCM and exit on A; A/B I/O and isolated synthetic RIX in MIPS service model',
         'download_filename':'PAL1.bda','install_filename':'仙剑1.bda',
         'game_resources_included':False,'checks':reports}
     (out/'release-manifest.json').write_bytes(json_bytes(manifest))

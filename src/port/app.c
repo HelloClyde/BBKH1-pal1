@@ -22,7 +22,7 @@ int h1_app_main(void) {
     if(!setjmp(return_point)) {
         h1pal_select_data_path();
         FILE *f=h1pal_fopen_data("H1PAL.LOG","wb");if(f)fclose(f);
-        h1pal_log("H1PAL 0.1.5 BEGIN");
+        h1pal_log("H1PAL 0.1.6 BEGIN");
         h1pal_log("DATA_PATH %s",PAL_H1_DATA_PATH);
         exit_status=h1pal_engine_main();
     }

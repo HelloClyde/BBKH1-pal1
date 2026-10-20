@@ -1,0 +1,457 @@
+{
+  "date": "2026-10-20",
+  "sdk_commit": "067fe072477861dfc8949d7b1a55279fb92d2548",
+  "sdlpal_commit": "224cb0a0cc839e0e8ecaa299cd480b02b372b9f7",
+  "source_date_epoch": 1792368000,
+  "exact_bda_full_firmware_checked": true,
+  "full_firmware_in_ci": false,
+  "hardware_verified": false,
+  "game_resources_in_source": false,
+  "version": "0.1.6",
+  "bda_sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+  "regression_bda_sha256": "42849acfc3af45b57728ce10083b1bfb4b5b48198d4648a5ddaf1bc566d88436",
+  "full_firmware_scope": "Private H1 V1.41 QEMU NAND on A: launch/load, six controls, ignored Z/X/V/space, isolated map music PCM with zero active SFX and clean exit; no physical hardware test",
+  "checks": {
+    "data-drives": {
+      "ok": true,
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+      "kind": "actual MIPS filesystem with modeled H1 A/B volumes",
+      "cases": [
+        {
+          "case": "A only",
+          "selected": "A",
+          "ok": true
+        },
+        {
+          "case": "B only",
+          "selected": "B",
+          "ok": true
+        },
+        {
+          "case": "A wins",
+          "selected": "A",
+          "ok": true
+        },
+        {
+          "case": "A folder without main",
+          "selected": "B",
+          "ok": true
+        },
+        {
+          "case": "B ignores A video",
+          "selected": "B",
+          "ok": true
+        },
+        {
+          "case": "missing both",
+          "selected": "A",
+          "ok": true
+        },
+        {
+          "case": "damaged A is not replaced with B",
+          "selected": "A",
+          "ok": true
+        }
+      ],
+      "selected_volume_saves_config_log": true,
+      "video_stays_on_selected_volume": true,
+      "clean_handles": true
+    },
+    "wide-ui": {
+      "ok": true,
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+      "fullscreen": [
+        480,
+        272
+      ],
+      "central_status_pixels_identical": true,
+      "title_uniform_cover": true,
+      "portrait_slot_geometry_preserved": true,
+      "uniform_display": "4/3",
+      "backup_restore": true,
+      "icon_at_new_edge": true,
+      "cursor_no_text_overlap": true,
+      "fixed_fullscreen": true,
+      "clean_exit": true,
+      "seconds": 0.62
+    },
+    "wide-battle": {
+      "ok": true,
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+      "background_scale": "9/8",
+      "display_scale": "4/3",
+      "fullscreen": [
+        480,
+        272
+      ],
+      "coordinate_grid_verified": true,
+      "four_rle_variants_at_edge": true,
+      "palette_shift": true,
+      "max_wave": true,
+      "fixed_fullscreen": true,
+      "clean_exit": true,
+      "seconds": 1.19
+    },
+    "display-controls": {
+      "ok": true,
+      "six_controls": true,
+      "letter_space_shortcuts_ignored": true,
+      "fixed_artwork_aspect": true,
+      "engine_canvas_corners": true,
+      "avi_corners": true,
+      "touch_coordinates": true,
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a"
+    },
+    "missing": {
+      "ok": true,
+      "kind": "cross-compiled MIPS with modeled H1 services",
+      "missing": true,
+      "stats": [
+        827081040,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "seconds": 0.28,
+      "seeks": 0,
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+      "leaked_handles": 0,
+      "leaked_allocations": 0
+    },
+    "music": {
+      "ok": true,
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+      "kind": "actual MIPS RIX/DBOPL mixer; no sound effects",
+      "fixture": "original synthetic RIX",
+      "tracks": [
+        {
+          "track": 1,
+          "peak": 4072,
+          "rms": 2955.13
+        }
+      ],
+      "mute_resume_stop": true,
+      "clean_exit": true
+    },
+    "music-resources": {
+      "ok": true,
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+      "kind": "actual MIPS RIX/DBOPL mixer; no sound effects",
+      "fixture": "owner resources",
+      "tracks": [
+        {
+          "track": 4,
+          "peak": 3559,
+          "rms": 1425.82
+        },
+        {
+          "track": 31,
+          "peak": 8428,
+          "rms": 1984.96
+        },
+        {
+          "track": 37,
+          "peak": 24727,
+          "rms": 6410.27
+        }
+      ],
+      "mute_resume_stop": true,
+      "clean_exit": true
+    },
+    "wide-scene": {
+      "ok": true,
+      "sha256": "42849acfc3af45b57728ce10083b1bfb4b5b48198d4648a5ddaf1bc566d88436",
+      "logical_map": [
+        360,
+        204
+      ],
+      "uniform_scale": "4/3",
+      "legacy_crop_identical": true,
+      "world_state_unchanged": true,
+      "menu_restore_identical": true,
+      "partial_ui_refresh": true,
+      "outside_npc_drawn": true,
+      "max_wave_rendered": true,
+      "touch_fullscreen_and_new_edges": true,
+      "uniform_pixels_verified": true,
+      "battle_margins_cleared": true,
+      "seconds": 17.66,
+      "log": "VIEW START\r\nVIEW STATE PASS\r\nVIEW TAP PASS\r\nVIEW PASS\r\n",
+      "leaked_allocations": 0,
+      "leaked_handles": 0
+    },
+    "ui-menus": {
+      "ok": true,
+      "sha256": "42849acfc3af45b57728ce10083b1bfb4b5b48198d4648a5ddaf1bc566d88436",
+      "menus": {
+        "title": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        },
+        "status": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        },
+        "equipment": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        },
+        "load-slots": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        },
+        "game-menu": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        },
+        "inventory-menu": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        },
+        "item-list": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        },
+        "magic-list": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        },
+        "magic-roles": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        },
+        "item-target": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        },
+        "confirmation": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        },
+        "shop-buy": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        },
+        "shop-sell": {
+          "width": 480,
+          "height": 272,
+          "logical_width": 360,
+          "logical_height": 204,
+          "map_full": 1
+        }
+      },
+      "clean_exit": true,
+      "seconds": 25.91
+    },
+    "battle": {
+      "ok": true,
+      "environment": "real MIPS SDLPAL with modeled H1 services",
+      "fullscreen": [
+        480,
+        272
+      ],
+      "sha256": "42849acfc3af45b57728ce10083b1bfb4b5b48198d4648a5ddaf1bc566d88436",
+      "log": "BATTLE START\r\nBATTLE READY\r\nBATTLE WON\r\n",
+      "stats": [
+        827081040,
+        1,
+        181,
+        1,
+        0,
+        200,
+        0,
+        0
+      ],
+      "seconds": 45.2
+    }
+  },
+  "native_A": {
+    "title": {
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+      "position": [
+        0,
+        0
+      ],
+      "stats": [
+        827081040,
+        1,
+        794,
+        0,
+        0,
+        1543,
+        0,
+        0
+      ],
+      "width": 480,
+      "height": 272,
+      "logical_width": 360,
+      "logical_height": 204,
+      "map_full": 1,
+      "opened": 1
+    },
+    "map": {
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+      "position": [
+        13632736,
+        7340192
+      ],
+      "stats": [
+        827081040,
+        1,
+        1311,
+        2,
+        0,
+        2960,
+        0,
+        0
+      ],
+      "width": 480,
+      "height": 272,
+      "logical_width": 360,
+      "logical_height": 204,
+      "map_full": 1,
+      "opened": 1
+    },
+    "controls": {
+      "ok": true,
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+      "six_controls": [
+        {
+          "matrix": 37,
+          "sampled": 1
+        },
+        {
+          "matrix": 27,
+          "sampled": 2
+        },
+        {
+          "matrix": 40,
+          "sampled": 4
+        },
+        {
+          "matrix": 35,
+          "sampled": 8
+        },
+        {
+          "matrix": 25,
+          "sampled": 16
+        },
+        {
+          "matrix": 24,
+          "sampled": 32
+        }
+      ],
+      "rix_current_next": [
+        31,
+        4294967295
+      ],
+      "rix_ready": 1,
+      "active_sound_effects_during_pcm_capture": 0
+    },
+    "ignored_keys": {
+      "ok": true,
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+      "keys": [
+        {
+          "matrix": 16,
+          "sampled": 0,
+          "width": 480,
+          "height": 272
+        },
+        {
+          "matrix": 17,
+          "sampled": 0,
+          "width": 480,
+          "height": 272
+        },
+        {
+          "matrix": 19,
+          "sampled": 0,
+          "width": 480,
+          "height": 272
+        },
+        {
+          "matrix": 23,
+          "sampled": 0,
+          "width": 480,
+          "height": 272
+        }
+      ]
+    },
+    "bgm_pcm": {
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+      "ok": true,
+      "sample_rate": 32000,
+      "channels": 2,
+      "frames": 96256,
+      "packets": 144,
+      "peak": 3905,
+      "rms": 813.41,
+      "nonzero_percent": 99.83
+    },
+    "exit": {
+      "sha256": "1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a",
+      "position": [
+        0,
+        0
+      ],
+      "stats": [
+        827081040,
+        1,
+        1664,
+        2,
+        0,
+        4028,
+        0,
+        0
+      ],
+      "width": 480,
+      "height": 272,
+      "logical_width": 360,
+      "logical_height": 204,
+      "map_full": 1,
+      "opened": 0
+    },
+    "log": "H1PAL 0.1.6 BEGIN\nDATA_PATH A:\\应用\\数据\\PAL\\\nVIDEO 480x272 stride=1920 bpp=32 lcd=0xa1902000\nAUDIO_OPEN_BEGIN source=22050 output=32000 mono=1 queue=0x8095f6a8\nAUDIO_DESCRIPTOR_BEGIN slot=0\nAUDIO_DESCRIPTOR_END slot=0 rc=1\nAUDIO_DEVICE_BEGIN\nAUDIO_DEVICE_END rc=1\nAUDIO_START_BEGIN\nAUDIO_START_END rc=1\nAUDIO_OPEN_END ready=1\nAUDIO_CLOSE_BEGIN batches=4028 submitted=1 nonzero=5502451 dropped=0 failures=0 underruns=0\nAUDIO_VOLUME_RESTORE percent=51\nAUDIO_CLOSE_END descriptors=1\nEND status=0 frames=1664 keys=2 taps=0\n"
+  }
+}

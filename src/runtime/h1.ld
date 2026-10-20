@@ -6,9 +6,11 @@ SECTIONS {
   .rodata : { *(.rodata*) }
   .h1meta : { KEEP(*(.h1meta)) }
   .data : { *(.data*) *(.sdata*) }
-  .init_array : {
+  .init_array : ALIGN(4) {
     __init_array_start = .;
     KEEP(*(SORT_BY_INIT_PRIORITY(.init_array.*))) KEEP(*(.init_array))
+    /* The bare-metal MIPS GCC toolchain emits legacy .ctors entries. */
+    KEEP(*(SORT_BY_INIT_PRIORITY(.ctors.*))) KEEP(*(.ctors))
     __init_array_end = .;
   }
   .got : { *(.got*) }
