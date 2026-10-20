@@ -120,16 +120,14 @@ def prepare(path: Path) -> dict[str, object]:
                 data[handler_offset:handler_offset + 4] = b"\0\0\0\0"
         offset += 4
 
-    if len(video_handlers) != 1 or video_handlers[0] not in {"MSVC", "msvc"}:
-        raise ValueError(f"expected one MS Video 1 stream, got {video_handlers}")
+    if len(video_handlers) != 1 or video_handlers[0] not in {"MSVC", "msvc", "H264"}:
+        raise ValueError(f"expected one MS Video 1 or H.264 stream, got {video_handlers}")
     if len(audio_handlers) != 1:
         raise ValueError(f"expected one PCM audio stream, got {len(audio_handlers)}")
 
-    normalized_stream_chunks = normalize_stream_chunks(
-        data, movi + 4, movi_end
-    )
+    normalized_stream_chunks = normalize_stream_chunks(data, movi + 4, movi_end) if video_handlers[0] != "H264" else 0
     idx1 = data.find(b"idx1", movi_end)
-    normalized_index_entries = normalize_index_entries(data, idx1)
+    normalized_index_entries = normalize_index_entries(data, idx1) if video_handlers[0] != "H264" else 0
 
     path.write_bytes(data)
     return {

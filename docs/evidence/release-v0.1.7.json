@@ -1,0 +1,561 @@
+{
+  "sdk_commit": "067fe072477861dfc8949d7b1a55279fb92d2548",
+  "sdlpal_commit": "224cb0a0cc839e0e8ecaa299cd480b02b372b9f7",
+  "source_date_epoch": 1792368000,
+  "exact_bda_full_firmware_checked": true,
+  "full_firmware_in_ci": false,
+  "hardware_verified": false,
+  "game_resources_in_source": false,
+  "version": "0.1.7",
+  "date": "2026-10-21",
+  "bda_sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d",
+  "regression_bda_sha256": "d9c1f34072920ba2858adb504e35fbbda42af4a5c42bf0ccc08dae8d04d2ed2d",
+  "h264bsd_commit": "42bcb5d753ad86d84903354bf3c68423c28adb7b",
+  "full_firmware_scope": "Private H1 V1.41 QEMU NAND on A: exact BDA, H.264 opening 1/2 complete at original timeline, live opening PCM capture, title, old save load, map and clean exit; no physical hardware test",
+  "checks": {
+    "data-drives": {
+      "ok": true,
+      "sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d",
+      "kind": "actual MIPS filesystem with modeled H1 A/B volumes",
+      "cases": [
+        {
+          "case": "A only",
+          "selected": "A",
+          "ok": true
+        },
+        {
+          "case": "B only",
+          "selected": "B",
+          "ok": true
+        },
+        {
+          "case": "A wins",
+          "selected": "A",
+          "ok": true
+        },
+        {
+          "case": "A folder without main",
+          "selected": "B",
+          "ok": true
+        },
+        {
+          "case": "B ignores A video",
+          "selected": "B",
+          "ok": true
+        },
+        {
+          "case": "missing both",
+          "selected": "A",
+          "ok": true
+        },
+        {
+          "case": "damaged A is not replaced with B",
+          "selected": "A",
+          "ok": true
+        }
+      ],
+      "selected_volume_saves_config_log": true,
+      "video_stays_on_selected_volume": true,
+      "clean_handles": true
+    },
+    "wide-ui": {
+      "ok": true,
+      "sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d",
+      "fullscreen": [
+        480,
+        272
+      ],
+      "central_status_pixels_identical": true,
+      "title_uniform_cover": true,
+      "portrait_slot_geometry_preserved": true,
+      "uniform_display": "4/3",
+      "backup_restore": true,
+      "icon_at_new_edge": true,
+      "cursor_no_text_overlap": true,
+      "fixed_fullscreen": true,
+      "clean_exit": true,
+      "seconds": 0.64
+    },
+    "wide-battle": {
+      "ok": true,
+      "sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d",
+      "background_scale": "9/8",
+      "display_scale": "4/3",
+      "fullscreen": [
+        480,
+        272
+      ],
+      "coordinate_grid_verified": true,
+      "four_rle_variants_at_edge": true,
+      "palette_shift": true,
+      "max_wave": true,
+      "fixed_fullscreen": true,
+      "clean_exit": true,
+      "seconds": 1.16
+    },
+    "display-controls": {
+      "ok": true,
+      "six_controls": true,
+      "letter_space_shortcuts_ignored": true,
+      "fixed_artwork_aspect": true,
+      "engine_canvas_corners": true,
+      "avi_corners": true,
+      "touch_coordinates": true,
+      "sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d"
+    },
+    "missing": {
+      "ok": true,
+      "kind": "cross-compiled MIPS with modeled H1 services",
+      "missing": true,
+      "stats": [
+        827081040,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "seconds": 0.3,
+      "seeks": 0,
+      "sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d",
+      "leaked_handles": 0,
+      "leaked_allocations": 0
+    },
+    "music": {
+      "ok": true,
+      "sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d",
+      "kind": "actual MIPS RIX/DBOPL mixer; no sound effects",
+      "fixture": "original synthetic RIX",
+      "tracks": [
+        {
+          "track": 1,
+          "peak": 4072,
+          "rms": 2955.13
+        }
+      ],
+      "mute_resume_stop": true,
+      "clean_exit": true
+    },
+    "h264-video": {
+      "ok": true,
+      "sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d",
+      "fixture": "original synthetic 64x48 H.264 Baseline and PCM sine",
+      "decoded_rgb555_matches_reference": true,
+      "frames": 8,
+      "reopen_movie": true,
+      "skip_with_cancel": true,
+      "unsupported_profile_clean_failure": true,
+      "nonzero_audio": true,
+      "clean_exit": true
+    },
+    "steam-video": {
+      "ok": true,
+      "sha256": "d9c1f34072920ba2858adb504e35fbbda42af4a5c42bf0ccc08dae8d04d2ed2d",
+      "video_pack_sha256": "6b8889ac7d608e780095d597e5a3f2b7e81d3e6528ad1a97283e0567a277b4d1",
+      "log": "VIDEO START\r\nVIDEO 1 FRAMES 8 KEYS 1 PASS\r\nVIDEO 2 FRAMES 8 KEYS 1 PASS\r\nVIDEO 3 FRAMES 8 KEYS 1 PASS\r\nVIDEO 4 FRAMES 8 KEYS 1 PASS\r\nVIDEO 5 FRAMES 8 KEYS 1 PASS\r\nVIDEO 6 FRAMES 8 KEYS 1 PASS\r\nVIDEO PASS\r\n",
+      "stats": [
+        827081040,
+        1,
+        48,
+        6,
+        0,
+        171,
+        0,
+        0
+      ],
+      "seconds": 25.19
+    },
+    "legacy-video": {
+      "ok": true,
+      "sha256": "d9c1f34072920ba2858adb504e35fbbda42af4a5c42bf0ccc08dae8d04d2ed2d",
+      "video_pack_sha256": "2ed4556a9f71794c0129dc726634fca78fbf7a97ab0dac1f2beb413733b4df73",
+      "log": "VIDEO START\r\nVIDEO 1 FRAMES 8 KEYS 1 PASS\r\nVIDEO 2 FRAMES 8 KEYS 1 PASS\r\nVIDEO 3 FRAMES 8 KEYS 1 PASS\r\nVIDEO 4 FRAMES 8 KEYS 1 PASS\r\nVIDEO 5 FRAMES 8 KEYS 1 PASS\r\nVIDEO 6 FRAMES 8 KEYS 1 PASS\r\nVIDEO PASS\r\n",
+      "stats": [
+        827081040,
+        1,
+        48,
+        6,
+        0,
+        171,
+        0,
+        0
+      ],
+      "seconds": 20.69
+    }
+  },
+  "all_video_frames": {
+    "ok": true,
+    "kind": "host H264BSD decode of every frame compared byte-for-byte with FFmpeg, not MIPS timing",
+    "clips": [
+      {
+        "clip": 1,
+        "frames": 258,
+        "decoded_yuv_sha256": "22179f4b3cc8dd07c29675c23d96c772b41cf4445cf55432eb21d4cea8b99ee4",
+        "h264bsd_matches_ffmpeg": true,
+        "ssim": 0.987192,
+        "original_bytes": 9079428,
+        "h264_bytes": 1422208
+      },
+      {
+        "clip": 2,
+        "frames": 920,
+        "decoded_yuv_sha256": "4dbb0ae3003cb2109488bb0fcc985519e55e97a9266490c9d417be5c880941e4",
+        "h264bsd_matches_ffmpeg": true,
+        "ssim": 0.979071,
+        "original_bytes": 31872668,
+        "h264_bytes": 9266844
+      },
+      {
+        "clip": 3,
+        "frames": 517,
+        "decoded_yuv_sha256": "fcbe26cd8f15824853979075f330b1048cd7cca69be54cf9fdd904fb110a18e2",
+        "h264bsd_matches_ffmpeg": true,
+        "ssim": 0.987009,
+        "original_bytes": 20245444,
+        "h264_bytes": 3102276
+      },
+      {
+        "clip": 4,
+        "frames": 200,
+        "decoded_yuv_sha256": "330e27729a78b8c80de985bd6be83bea72432fbe40a4f0d1c9e207b5f9cd7d53",
+        "h264bsd_matches_ffmpeg": true,
+        "ssim": 0.980807,
+        "original_bytes": 7825060,
+        "h264_bytes": 1661256
+      },
+      {
+        "clip": 5,
+        "frames": 2294,
+        "decoded_yuv_sha256": "8cfac1b8191111d75d3a6d5692abbe8fbe18d4360b4d5c12b1f2b1b5f9dac32e",
+        "h264bsd_matches_ffmpeg": true,
+        "ssim": 0.983439,
+        "original_bytes": 82833972,
+        "h264_bytes": 16112348
+      },
+      {
+        "clip": 6,
+        "frames": 2196,
+        "decoded_yuv_sha256": "d85f6545cf07ce0b75df0bdaac7fa581f1229c99442819dea9df1dc5811ad30c",
+        "h264bsd_matches_ffmpeg": true,
+        "ssim": 0.996525,
+        "original_bytes": 36953012,
+        "h264_bytes": 12249724
+      }
+    ]
+  },
+  "resources": {
+    "profile": "steam-h264-baseline",
+    "source": "User-provided local Steam PAL installation; no original installation paths recorded",
+    "rights": "Game data retain the original proprietary rights; not licensed under the application GPL",
+    "video_reencoded": true,
+    "files": {
+      "PAL9588.PAK": {
+        "size": 27168336,
+        "sha256": "18af405d5ee7e0f31148a4bc6733bba6d2cf141ba1b7f1e2fb49ec52e4dc3e30"
+      },
+      "PALVIDEO.PAK": {
+        "size": 43815104,
+        "sha256": "6b8889ac7d608e780095d597e5a3f2b7e81d3e6528ad1a97283e0567a277b4d1"
+      }
+    },
+    "install_directories": [
+      "A:\\应用\\数据\\PAL\\",
+      "B:\\应用\\数据\\PAL\\"
+    ],
+    "volume_selection": "A has PAL9588.PAK: use A; otherwise use B when its PAL9588.PAK exists; keep video and default saves on the selected volume",
+    "minimum_program_version": "0.1.7",
+    "video_codec": "H.264 Constrained Baseline in AVI",
+    "width": 288,
+    "height": 180,
+    "frame_rate": "15/1",
+    "crf": 18,
+    "audio": "Original PCM, sample-for-sample unchanged",
+    "original_video_pack_size": 188810064,
+    "video_pack_reduction_percent": 76.79
+  },
+  "native_A": {
+    "video": {
+      "ok": true,
+      "sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d",
+      "kind": "H1 V1.41 complete firmware simulator; not physical hardware",
+      "movies": [
+        {
+          "clip": 1,
+          "frames": 258,
+          "h264_frames": 258,
+          "decode_ms": 623,
+          "max_decode_ms": 6,
+          "elapsed_ms": 17203,
+          "expected_ms": 17200.0,
+          "skipped": 0
+        },
+        {
+          "clip": 2,
+          "frames": 920,
+          "h264_frames": 920,
+          "decode_ms": 2586,
+          "max_decode_ms": 7,
+          "elapsed_ms": 61337,
+          "expected_ms": 61333.333,
+          "skipped": 0
+        }
+      ],
+      "log": "H1PAL 0.1.7 BEGIN\nDATA_PATH A:\\应用\\数据\\PAL\\\nVIDEO 480x272 stride=1920 bpp=32 lcd=0xa1902000\nAUDIO_OPEN_BEGIN source=22050 output=32000 mono=1 queue=0x8095f6a8\nAUDIO_DESCRIPTOR_BEGIN slot=0\nAUDIO_DESCRIPTOR_END slot=0 rc=1\nAUDIO_DEVICE_BEGIN\nAUDIO_DEVICE_END rc=1\nAUDIO_START_BEGIN\nAUDIO_START_END rc=1\nAUDIO_OPEN_END ready=1\nAVI 1.avi frames=258 h264=258 decode_ms=623 max_ms=6 elapsed_ms=17203 skipped=0\nAVI 2.avi frames=920 h264=920 decode_ms=2586 max_ms=7 elapsed_ms=61337 skipped=0\nAUDIO_CLOSE_BEGIN batches=6082 submitted=1 nonzero=7541396 dropped=0 failures=0 underruns=0\nAUDIO_VOLUME_RESTORE percent=51\nAUDIO_CLOSE_END descriptors=1\nEND status=0 frames=2983 keys=1 taps=0\n"
+    },
+    "title": {
+      "sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d",
+      "position": [
+        0,
+        0
+      ],
+      "stats": [
+        827081040,
+        1,
+        2515,
+        0,
+        0,
+        4789,
+        0,
+        0
+      ],
+      "width": 480,
+      "height": 272,
+      "logical_width": 360,
+      "logical_height": 204,
+      "map_full": 1,
+      "opened": 1
+    },
+    "map": {
+      "sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d",
+      "position": [
+        13632736,
+        7340192
+      ],
+      "stats": [
+        827081040,
+        1,
+        2595,
+        1,
+        0,
+        4909,
+        0,
+        0
+      ],
+      "width": 480,
+      "height": 272,
+      "logical_width": 360,
+      "logical_height": 204,
+      "map_full": 1,
+      "opened": 1
+    },
+    "pcm": {
+      "sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d",
+      "ok": true,
+      "sample_rate": 32000,
+      "channels": 2,
+      "frames": 96320,
+      "packets": 144,
+      "peak": 15605,
+      "rms": 3497.18,
+      "nonzero_percent": 68.86,
+      "source": "live H.264 opening 1, only packets newer than the starting audio sequence",
+      "video_before": {
+        "frames": 19,
+        "avi_fp": 2212879720
+      },
+      "video_after": {
+        "frames": 52,
+        "avi_fp": 2212879720
+      }
+    },
+    "exit": {
+      "sha256": "876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d",
+      "position": [
+        0,
+        0
+      ],
+      "stats": [
+        827081040,
+        1,
+        2983,
+        1,
+        0,
+        6082,
+        0,
+        0
+      ],
+      "width": 480,
+      "height": 272,
+      "logical_width": 360,
+      "logical_height": 204,
+      "map_full": 1,
+      "opened": 0
+    }
+  },
+  "encoder_checks": [
+    {
+      "source_sha256": "c9e68039ab02bebadb36cdce2308502db42b457bd821114ee487cfbe092f76da",
+      "sha256": "7ce7874d964f3e442c8957d70f48c339246db283f671bed342a788e363790a50",
+      "video_info": {
+        "codec_name": "h264",
+        "profile": "Constrained Baseline",
+        "width": 288,
+        "height": 180,
+        "r_frame_rate": "15/1",
+        "nb_frames": "258"
+      },
+      "video_bit_exact": false,
+      "video_reencoded": true,
+      "audio_bit_exact": true,
+      "crf": 18,
+      "largest_chunk": 22050,
+      "size": 1422208,
+      "width": 288,
+      "height": 180,
+      "video_handler": "H264",
+      "audio_handler_before": 1,
+      "audio_handler_after": 0,
+      "suggested_buffer_before": 1048576,
+      "suggested_buffer_after": 65536,
+      "odd_stream_chunks_normalized": 0,
+      "odd_index_entries_normalized": 0
+    },
+    {
+      "source_sha256": "51f60a923bf1199910b12db84e1b58d63b4f45c1f653a447153ef26cbda3720d",
+      "sha256": "a57052f87d99075a9ce6e66f209981c692c4dbe82d3d4287bda7524091c7fb5a",
+      "video_info": {
+        "codec_name": "h264",
+        "profile": "Constrained Baseline",
+        "width": 288,
+        "height": 180,
+        "r_frame_rate": "15/1",
+        "nb_frames": "920"
+      },
+      "video_bit_exact": false,
+      "video_reencoded": true,
+      "audio_bit_exact": true,
+      "crf": 18,
+      "largest_chunk": 19116,
+      "size": 9266844,
+      "width": 288,
+      "height": 180,
+      "video_handler": "H264",
+      "audio_handler_before": 1,
+      "audio_handler_after": 0,
+      "suggested_buffer_before": 1048576,
+      "suggested_buffer_after": 65536,
+      "odd_stream_chunks_normalized": 0,
+      "odd_index_entries_normalized": 0
+    },
+    {
+      "source_sha256": "28a97b9f3812ffa32185dea996e2928c1090e9786953f9d7cc9107ad54fc3cc0",
+      "sha256": "b3a42adb0c9ffa8c11118e1e522a99fa00403e9592c2f2adaa0b3b2e01eea97c",
+      "video_info": {
+        "codec_name": "h264",
+        "profile": "Constrained Baseline",
+        "width": 288,
+        "height": 180,
+        "r_frame_rate": "15/1",
+        "nb_frames": "517"
+      },
+      "video_bit_exact": false,
+      "video_reencoded": true,
+      "audio_bit_exact": true,
+      "crf": 18,
+      "largest_chunk": 30999,
+      "size": 3102276,
+      "width": 288,
+      "height": 180,
+      "video_handler": "H264",
+      "audio_handler_before": 1,
+      "audio_handler_after": 0,
+      "suggested_buffer_before": 1048576,
+      "suggested_buffer_after": 65536,
+      "odd_stream_chunks_normalized": 0,
+      "odd_index_entries_normalized": 0
+    },
+    {
+      "source_sha256": "600616fa3aa551ae3b783715325066051a4c46151ee8daeb4e0e4243b869aa73",
+      "sha256": "4926678bd69b118283d735c3d9b125227474220e6d27dcd3ab74129a5a7f03c1",
+      "video_info": {
+        "codec_name": "h264",
+        "profile": "Constrained Baseline",
+        "width": 288,
+        "height": 180,
+        "r_frame_rate": "15/1",
+        "nb_frames": "200"
+      },
+      "video_bit_exact": false,
+      "video_reencoded": true,
+      "audio_bit_exact": true,
+      "crf": 18,
+      "largest_chunk": 20967,
+      "size": 1661256,
+      "width": 288,
+      "height": 180,
+      "video_handler": "H264",
+      "audio_handler_before": 1,
+      "audio_handler_after": 0,
+      "suggested_buffer_before": 1048576,
+      "suggested_buffer_after": 65536,
+      "odd_stream_chunks_normalized": 0,
+      "odd_index_entries_normalized": 0
+    },
+    {
+      "source_sha256": "30c6a574b2625140ca5ad1b456e8fb30ae9026b1684f90381630caff4e24f069",
+      "sha256": "3d2007974c378519bfbd5e09fa0e3469256d63a04f5d5818242964a20c98b6fb",
+      "video_info": {
+        "codec_name": "h264",
+        "profile": "Constrained Baseline",
+        "width": 288,
+        "height": 180,
+        "r_frame_rate": "15/1",
+        "nb_frames": "2294"
+      },
+      "video_bit_exact": false,
+      "video_reencoded": true,
+      "audio_bit_exact": true,
+      "crf": 18,
+      "largest_chunk": 30594,
+      "size": 16112348,
+      "width": 288,
+      "height": 180,
+      "video_handler": "H264",
+      "audio_handler_before": 1,
+      "audio_handler_after": 0,
+      "suggested_buffer_before": 1048576,
+      "suggested_buffer_after": 65536,
+      "odd_stream_chunks_normalized": 0,
+      "odd_index_entries_normalized": 0
+    },
+    {
+      "source_sha256": "53a8c472d50263d512bae327e7064e9b88ff459788dc5bbee8fd7f8a55300217",
+      "sha256": "a6a0fe05993fb159fcba10c2429a8445ffdb3c87c9a1c905af30f42c758fa4c0",
+      "video_info": {
+        "codec_name": "h264",
+        "profile": "Constrained Baseline",
+        "width": 288,
+        "height": 180,
+        "r_frame_rate": "15/1",
+        "nb_frames": "2196"
+      },
+      "video_bit_exact": false,
+      "video_reencoded": true,
+      "audio_bit_exact": true,
+      "crf": 18,
+      "largest_chunk": 27086,
+      "size": 12249724,
+      "width": 288,
+      "height": 180,
+      "video_handler": "H264",
+      "audio_handler_before": 1,
+      "audio_handler_after": 0,
+      "suggested_buffer_before": 1048576,
+      "suggested_buffer_after": 65536,
+      "odd_stream_chunks_normalized": 0,
+      "odd_index_entries_normalized": 0
+    }
+  ]
+}

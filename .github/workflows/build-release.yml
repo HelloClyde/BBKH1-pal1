@@ -56,6 +56,8 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tests/music.py
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python tests/h264_video.py
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tests/mips_smoke.py --missing
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tests/data_drives.py

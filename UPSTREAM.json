@@ -9,6 +9,12 @@
     "commit": "067fe072477861dfc8949d7b1a55279fb92d2548",
     "path": "sdk"
   },
+  "h264bsd": {
+    "url": "https://github.com/oneam/h264bsd.git",
+    "commit": "42bcb5d753ad86d84903354bf3c68423c28adb7b",
+    "path": "third_party/h264bsd",
+    "license": "Apache-2.0 decoder; MIT additional wrappers"
+  },
   "9588-reference": {
     "url": "https://github.com/HelloClyde/BBK9588-pal1.git",
     "commit": "10532f74ced55061b6147538dee80797527fb203",

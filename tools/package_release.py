@@ -25,6 +25,7 @@ def source(destination,dependencies,commit):
         with zipfile.ZipFile(io.BytesIO(git(repo,'archive','--format=zip','HEAD'))) as archive:
             for item in archive.infolist():
                 if item.is_dir():continue
+                if relative=='third_party/h264bsd' and item.filename not in ('LICENSE.md','README.md') and not item.filename.startswith('src/'):continue
                 name=(relative+'/' if relative else '')+item.filename
                 # Unused upstream 3DS artwork binaries and WinRT signing samples
                 # are not needed to build this port or its complete source archive.
@@ -34,7 +35,7 @@ def source(destination,dependencies,commit):
                 assert PurePosixPath(name).suffix.lower() not in {'.pak','.mkf','.rpg','.raw','.nand','.bda','.exe','.dll','.pyc','.o'},name
                 files[name]=archive.read(item)
     manifest={'application_commit':commit,'dependencies':dependencies,'files':{n:sha(d) for n,d in sorted(files.items())},
-        'omitted_unused_upstream_files':'3DS .bin artwork and WinRT .pfx sample signing certificates; no H1 build inputs omitted'}
+        'omitted_unused_upstream_files':'3DS .bin artwork, WinRT .pfx samples and h264bsd platform demos/test media; no H1 build inputs omitted'}
     prefix='BBKH1-pal1-v'+(ROOT/'VERSION').read_text().strip()+'/'
     with zipfile.ZipFile(destination,'w') as z:
         for name,data in sorted(files.items()):add(z,prefix+name,data)
@@ -80,7 +81,7 @@ def main():
     if args.tag:assert args.tag=='v'+version
     deps={k:v for k,v in read(ROOT/'UPSTREAM.json').items() if 'path' in v}
     reports={}
-    for name in ('release','wide-ui','wide-battle','display-controls','music','missing','data-drives'):
+    for name in ('release','wide-ui','wide-battle','display-controls','music','h264-video','missing','data-drives'):
         r=read(ROOT/f'build/verification/{name}.json');assert r['ok'] and r['sha256']==meta['sha256'];reports[name]=r
     for name,digest in meta['sources'].items():assert sha((ROOT/name).read_bytes())==digest,'Rebuild after source changes: '+name
     out.mkdir(parents=True,exist_ok=True)
@@ -90,7 +91,7 @@ def main():
     (out/'RELEASE-NOTES.md').write_bytes((ROOT/f'docs/release-v{version}.md').read_bytes())
     manifest={'version':version,'application_commit':commit,'dependencies':deps,'bda_sha256':meta['sha256'],
         'full_firmware_in_ci':False,'hardware_verified':False,'exact_bda_full_firmware_checked':True,
-        'full_firmware_scope':'H1 V1.41 launch/load, six controls, ignored Z/X/V/space, map BGM PCM and exit on A; A/B I/O and isolated synthetic RIX in MIPS service model',
+        'full_firmware_scope':'H1 V1.41 exact BDA with H.264 resource pack: opening movies, PCM, title/map/load/exit; six controls, A/B I/O, synthetic RIX and synthetic H.264 in MIPS service model',
         'download_filename':'PAL1.bda','install_filename':'仙剑1.bda',
         'game_resources_included':False,'checks':reports}
     (out/'release-manifest.json').write_bytes(json_bytes(manifest))
@@ -99,6 +100,7 @@ def main():
         'UPSTREAM.json':(ROOT/'UPSTREAM.json').read_bytes()}
     for name,path in [('SDLPAL-GPL.txt','third_party/sdlpal/gpl.txt'),('H1-SDK-LICENSE.txt','sdk/LICENSE'),('H1-SDK-NOTICE.txt','sdk/NOTICE')]:
         install['LICENSES/'+name]=(ROOT/path).read_bytes()
+    install['LICENSES/H264BSD-LICENSE.md']=(ROOT/'third_party/h264bsd/LICENSE.md').read_bytes()
     for p in (ROOT/'docs').rglob('*'):
         if p.is_file():install[p.relative_to(ROOT).as_posix()]=p.read_bytes()
     with zipfile.ZipFile(out/f'BBKH1-pal1-v{version}-install.zip','w') as z:

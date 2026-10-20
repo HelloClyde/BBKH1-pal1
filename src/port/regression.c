@@ -69,6 +69,8 @@ int h1pal_regression_auto_battle(void)
         g_Battle.BattleResult == kBattleResultOnGoing;
 }
 
+int h1pal_regression_video_active(void) { return g_regression_mode == REGRESSION_VIDEO; }
+
 static void reset_log(const char *heading)
 {
     FILE *file = h1pal_fopen_data(TEST_LOG, "wb");
@@ -156,7 +158,7 @@ static void run_save_regression(void)
 static void run_video_regression(void)
 {
     static const char *const movies[] = {
-        "3.avi", "4.avi", "5.avi", "6.avi"
+        "1.avi", "2.avi", "3.avi", "4.avi", "5.avi", "6.avi"
     };
     unsigned i;
     int passed = 1;
@@ -168,7 +170,7 @@ static void run_video_regression(void)
         unsigned exit_keys = h1pal_avi_last_exit_keys();
         char line[64];
         snprintf(line, sizeof(line), "VIDEO %u FRAMES %u KEYS %u %s",
-            i + 3u, frames, exit_keys, played ? "PASS" : "FAIL");
+            i + 1u, frames, exit_keys, played ? "PASS" : "FAIL");
         append_log(line);
         if (!played) {
             passed = 0;
@@ -406,6 +408,7 @@ VOID PAL_GameMain(VOID)
 
 #else
 int h1pal_regression_active(void){return 0;}
+int h1pal_regression_video_active(void){return 0;}
 int h1pal_regression_auto_battle(void){return 0;}
 extern void H1PAL_InternalGameMain(void);
 void PAL_GameMain(void){H1PAL_InternalGameMain();}

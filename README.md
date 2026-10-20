@@ -1,7 +1,7 @@
 # 仙剑1 for BBK H1 / Y100
 
 基于 SDLPAL 的原生 H1 BDA，参考 HelloClyde 的 BBK9588-pal1 移植。
-适用于 H1 / Y100 V1.41，固定全屏显示，应用名称为“仙剑1”。v0.1.6 修复背景音乐，操作简化为方向、确定和取消；支持 A/B 盘资源自动选择。
+适用于 H1 / Y100 V1.41，固定全屏显示，应用名称为“仙剑1”。v0.1.7 支持 H.264 压缩过场：视频包由 188.8 MB 降到 43.8 MB，保留 288×180、15 fps 与原音轨。
 
 ## 快速开始
 
@@ -9,7 +9,8 @@
 单独下载的 BDA 复制到设备时命名为“仙剑1.bda”；安装 ZIP 内已使用这个中文名称。
 程序 ZIP 只包含程序与说明；`PAL9588.PAK` 和 `PALVIDEO.PAK` 作为独立 Release 附件提供，
 也可从自己拥有的原版安装目录生成。两个 PAK 下载后按下列路径放置。
-已有上一版资源的用户只需替换 BDA，存档兼容。
+升级压缩视频时，同时替换 BDA 和 `PALVIDEO.PAK`；`PAL9588.PAK`、配置与存档继续使用。
+新版 BDA 也兼容旧 MS Video 1 视频包；新 H.264 包需要 v0.1.7 或更新程序。
 
 ```text
 A:\应用\程序\仙剑1.bda
@@ -36,7 +37,9 @@ python tools/prepare-steam.py --steam-root "D:/SteamLibrary/steamapps/common/PAL
 ```
 
 工具读取 `PAL_DOS` 的 21 项核心数据和 `PAL98` 的六段 AVI，生成两个 PAK。
-AVI 保留原始 288×180、15 fps 画面，只规范容器字段，不再次有损编码。
+默认将六段视频编码为适合 H1 的 H.264 Constrained Baseline，使用原始分辨率、帧率和逐样本不变的 PCM 音轨。
+选择 CRF 18、单参考帧、无 B 帧/CABAC/去块滤波与全像素运动搜索，减少 MIPS 解码开销。
+AVI 作为容器不变；压缩的是视频编码。需要保留原始画面数据时，加 `--video-codec original`。
 也可通过 `tools/palpak.py pack <数据目录> <输出PAK>` 打包，或复用兼容的旧 PAK。
 资源格式与详细来源见 [NOTICE.md](NOTICE.md)。源码仓库不包含游戏数据包、存档或固件；
 Release 中的独立 PAK 附件保留原游戏资源权利，不属于源码的 GPL 许可。
@@ -49,15 +52,17 @@ Release 中的独立 PAK 附件保留原游戏资源权利，不属于源码的 
 
 | H1 完整固件：桌面图标 | H1 完整固件：启动菜单 |
 | --- | --- |
-| ![H1 桌面图标](docs/evidence/desktop-icon.png) | ![启动菜单](docs/evidence/v0.1.6-title.png) |
+| ![H1 桌面图标](docs/evidence/desktop-icon.png) | ![启动菜单](docs/evidence/v0.1.7-title.png) |
 
 | H1 完整固件：地图 | H1 完整固件：仙术 |
 | --- | --- |
-| ![地图](docs/evidence/v0.1.6-map.png) | ![仙术](docs/evidence/ui-magic-aligned.png) |
+| ![地图](docs/evidence/v0.1.7-map.png) | ![仙术](docs/evidence/ui-magic-aligned.png) |
+
+![H.264 过场，完整 H1 固件模拟器](docs/evidence/v0.1.7-h264.png)
 
 ![战斗，完整 H1 固件模拟器](docs/evidence/battle-firmware.png)
 
-主菜单和地图来自 v0.1.6；其余截图对应此前的已记录构建，具体哈希与范围见验证文档。
+主菜单和地图来自 v0.1.7；其余截图对应此前的已记录构建，具体哈希与范围见验证文档。
 
 ## 操作
 
@@ -92,7 +97,7 @@ Release 中的独立 PAK 附件保留原游戏资源权利，不属于源码的 
 - 480×272、32 位 H1 游戏帧缓冲；调色板游戏和 RGB555 AVI 均保持横屏方向。
 - RIX/DBOPL 音乐、VOC/WAV 音效；22050 Hz 单声道混音经整数重采样输出至
   H1 的 32000 Hz PCM 环形缓冲；退出时停止 PCM 并恢复原音量。
-- SDLPAL Microsoft Video 1 解码器播放六段可选 AVI，不调用 9588 或 H1 私有播放器。
+- H264BSD 播放 H.264 Baseline AVI，SDLPAL 解码器继续兼容 MS Video 1；不链接商业 H1 飞天影音的二进制代码。
 - H1 文件、内存、游戏窗口、校准触摸和同时按键接口；没有链接 9588 SDK。
 - 独立 512 KiB 栈，退出统一关闭容器句柄并回收本应用分配的内存。
 
@@ -103,6 +108,7 @@ Release 中的独立 PAK 附件保留原游戏资源权利，不属于源码的 
 | 运行 | BBK H1 / Y100 V1.41；使用者自己的仙剑 DOS 核心资源，PAL98 视频可选 |
 | 引擎子模块 | [SDLPAL](https://github.com/sdlpal/sdlpal)，`224cb0a0cc839e0e8ecaa299cd480b02b372b9f7` |
 | SDK 子模块 | [H1 BDA SDK](https://github.com/MrDefinition1999/bbk-h1-bda-sdk)，`067fe072477861dfc8949d7b1a55279fb92d2548`，目录 `sdk/` |
+| H.264 子模块 | [H264BSD](https://github.com/oneam/h264bsd)，`42bcb5d753ad86d84903354bf3c68423c28adb7b`，目录 `third_party/h264bsd/` |
 | 已验证开发环境 | Windows x64，Python 3.11.5；GNU MIPS little-endian soft-float GCC 15.2.0；Actions 配置为 Python 3.12 |
 | Python | Pillow 12.3.0（图标打包），Unicorn 2.1.4、pyelftools 0.33（主机 MIPS 服务模型测试） |
 | 可选资源生成 | FFmpeg（需放入 PATH）；原版游戏安装文件 |
@@ -118,7 +124,7 @@ Release 中的独立 PAK 附件保留原游戏资源权利，不属于源码的 
 ```powershell
 git clone https://github.com/HelloClyde/BBKH1-pal1.git
 cd BBKH1-pal1
-git submodule update --init sdk third_party/sdlpal
+git submodule update --init sdk third_party/sdlpal third_party/h264bsd
 python -m pip install -r requirements.txt
 python tools/install_toolchain.py
 python tools/build.py
@@ -138,15 +144,17 @@ python -m unittest discover -s tests -p "test_*.py"
 python tests/wide_ui.py
 python tests/wide_battle.py
 python tests/display_controls.py
+python tests/music.py
+python tests/h264_video.py
 python tests/mips_smoke.py --missing
 python tests/data_drives.py
 ```
 
 本地真实游戏资源测试使用 `build/resources/PAL9588.PAK`；菜单与地图测试还需要使用者自己的
 `build/verification/native-1.rpg`。可用 `python tools/build.py --regression` 构建独立测试 BDA；
-正式 BDA 不执行测试标记。视频抽样测试使用 `build/steam-resources/`。上述数据不随仓库分发。
+正式 BDA 不执行测试标记。视频抽样测试默认使用 `build/h264-resources/`，也可用 `--resources` 指定自有资源目录。上述数据不随仓库分发。
 
-提交源码后执行 `python tools/package_release.py` 可生成程序安装 ZIP、含两项固定依赖的完整源码 ZIP、
+提交源码后执行 `python tools/package_release.py` 可生成程序安装 ZIP、含三项固定依赖的完整源码 ZIP、
 BDA、构建信息、验证清单及 SHA256SUMS；此公开打包入口不读取游戏资源。
 `tools/package.py --resources build/resources` 只用于个人本地生成含自有资源的完整安装包，请勿作为公共 Release 上传。
 源码 ZIP 已展开构建必需子模块，可跳过子模块初始化直接执行安装依赖、安装工具链和构建命令；
@@ -154,10 +162,10 @@ BDA、构建信息、验证清单及 SHA256SUMS；此公开打包入口不读取
 
 ## 验证范围
 
-当前 BDA SHA-256：`1370d668f617334fb2f09a1b1f74c45f6eb9e54ea5721991b16f600df7283a2a`。
-2026-10-20 的 v0.1.6 检查覆盖六个操作键、忽略字母/空格快捷键、固定全屏和独立 RIX 配乐。
+当前 BDA SHA-256：`876dee798414d7bf4f4962305fbf737ce81d86b588b9b5988e9c2db86dc0021d`。
+2026-10-21 的 v0.1.7 新增 H.264 视频与逐像素参考、PCM 音轨、跳过/重新打开及旧视频兼容检查。
 主机模型实际执行编译后的 MIPS 代码，检查 UI、战斗背景、触摸、A/B 资源选择和缺资源退出；
-完整 H1 固件模拟器另行检查启动、读档、操作、配乐 PCM 和退出。
+完整 H1 固件模拟器另行检查完整 H.264 片头、原音轨 PCM、时间线、读档、地图和退出。
 旧版 A/B 存档重启读回记录保留在 [v0.1.5 验证](docs/verification-v0.1.5.md)。
 此前地图、战斗、存档、视频与 13 类菜单的检查及不同构建哈希均保留在
 [当前验证](docs/verification.md) 和 [菜单验证](docs/verification-v0.1.4.md)。
@@ -173,4 +181,5 @@ Release 使用同一构建产物。CI 不执行私有固件，也不宣称物理
 
 感谢 [HelloClyde/BBK9588-pal1](https://github.com/HelloClyde/BBK9588-pal1) 提供 9588 参考移植与兼容层、PAK、AVI 和寻路实现；
 感谢 SDLPAL 及 AdPlug/OPL、FFmpeg 相关贡献者；感谢 MrDefinition1999 的 H1 BDA SDK。
+感谢 Android Open Source Project 与 Sam Leitch 的 H264BSD；H1 飞天影音提供了本机 H.264/MPEG-4 能力的参考。
 图标通过内置 GPT Image 重新设计，保留原红色“仙”字主体，参考 H1 桌面图标；提示词、参考图和来源记录在 `assets/`。

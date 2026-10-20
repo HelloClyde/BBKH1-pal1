@@ -3,6 +3,8 @@
 #include "palcfg.h"
 #include "platform.h"
 #include "regression.h"
+#include "h264_video.h"
+#include "app.h"
 
 /*
  * The decoder and RIFF parser come from SDLPAL's GPL aviplay.c.  That source
@@ -30,7 +32,7 @@ BOOL PAL_PlayAVI(const char *path)
     BOOL enabled = gConfig.fEnableAviPlay;
     BOOL result;
 
-    if (h1pal_regression_active() && path &&
+    if (h1pal_regression_active() && !h1pal_regression_video_active() && path &&
         ((path[0] == '1' && path[1] == '.') ||
          (path[0] == '2' && path[1] == '.'))) {
         return TRUE;
@@ -42,8 +44,15 @@ BOOL PAL_PlayAVI(const char *path)
     gConfig.fEnableAviPlay = TRUE;
     g_presented_frames = 0;
     g_exit_keys = 0;
+    h1pal_h264_reset();
+    unsigned started=h1pal_platform_ticks();
     result = H1PAL_InternalPlayAVI(path);
+    result = result && !h1pal_h264_failed();
+    h1pal_h264_close();
     g_exit_keys = g_InputState.dwKeyPress & (kKeyMenu | kKeySearch);
+    h1pal_log("AVI %s frames=%u h264=%u decode_ms=%u max_ms=%u elapsed_ms=%u skipped=%u",
+        path,g_presented_frames,h1pal_h264_frames,h1pal_h264_total_ms,h1pal_h264_max_ms,
+        h1pal_platform_ticks()-started,g_exit_keys);
     gConfig.fEnableAviPlay = enabled;
     result = result && g_presented_frames != 0u;
     if (result) {

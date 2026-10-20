@@ -5,6 +5,7 @@ import argparse, hashlib, json, os, subprocess, sys, shutil
 ROOT=Path(__file__).resolve().parents[1]
 ENGINE_COMMIT='224cb0a0cc839e0e8ecaa299cd480b02b372b9f7'
 SDK_COMMIT='067fe072477861dfc8949d7b1a55279fb92d2548'
+H264_COMMIT='42bcb5d753ad86d84903354bf3c68423c28adb7b'
 # GCC's __DATE__ is visible in SDLPAL's about string. Match the tested build.
 BUILD_EPOCH='1792368000'
 def run(args):
@@ -22,8 +23,9 @@ def main():
     dependency('third_party/sdlpal',ENGINE_COMMIT)
     if sdk!=ROOT/'sdk':raise ValueError('Use the pinned sdk/ submodule')
     dependency('sdk',SDK_COMMIT)
+    dependency('third_party/h264bsd',H264_COMMIT)
     mode='regression' if args.regression else 'release';build=ROOT/'build'/mode;build.mkdir(parents=True,exist_ok=True)
-    includes=[ROOT/'src/libc/include',ROOT/'src/compat',ROOT/'src/port',sdk/'sdk/include',core]
+    includes=[ROOT/'src/libc/include',ROOT/'src/compat',ROOT/'src/port',sdk/'sdk/include',core,ROOT/'third_party/h264bsd/src']
     flags=['-EL','-march=mips32','-mabi=32','-msoft-float','-mno-abicalls','-G0','-fno-pic','-O2',
         '-ffreestanding','-fno-builtin','-fno-stack-protector','-ffunction-sections','-fdata-sections',
         '-fsigned-char','-fno-strict-aliasing','-g','-DPAL_CLASSIC','-DPAL_HAS_PLATFORM_SPECIFIC_UTILS=1',
@@ -31,12 +33,13 @@ def main():
     flags += [v for p in includes for v in ('-I',str(p))]
     sources=[ROOT/'src'/p for p in ('runtime/entry.S','runtime/startup.c','runtime/setjmp.S','runtime/cxx_runtime.cpp',
         'libc/runtime.c','compat/mini_sdl.c','port/platform.c','port/native_audio.c','port/app.c',
-        'port/autopath.c','port/audio_stub.c','port/avi_9588.c','port/pal_utils.c','port/regression.c','port/bda_main.c','port/wide_scene.c','port/wide_battle.c','port/wide_ui.c')]
+        'port/autopath.c','port/audio_stub.c','port/avi_9588.c','port/h264_video.c','port/pal_utils.c','port/regression.c','port/bda_main.c','port/wide_scene.c','port/wide_battle.c','port/wide_ui.c')]
     names='audio aviplay battle ending fight font game global input itemmenu magicmenu main map midi palette palcfg palcommon play res rngplay scene script text resampler sound ui uibattle uigame util video yj1'.split()
     from core_overrides import generate
     overrides=generate(core,build/'core')
     sources += [overrides.get(n+'.c',core/(n+'.c')) for n in names]+[core/'adplug/fmopl.c',core/'rixplay.cpp']
     sources += [core/'adplug'/(n+'.cpp') for n in 'binfile binio dbemuopl dbopl demuopl dosbox_opl emuopl fprovide player rix surroundopl'.split()]
+    sources += sorted((ROOT/'third_party/h264bsd/src').glob('*.c'))
     headers=hashlib.sha256(b''.join(p.read_bytes() for d in includes for p in sorted(d.rglob('*.h')))).digest()
     def compile(item):
         i,source=item;cpp=source.suffix=='.cpp';obj=build/f'{i:02d}-{source.stem}.o'
@@ -47,6 +50,7 @@ def main():
                 '-DPAL_RLEBlitToSurface=H1PAL_InternalRLE','-DPAL_RLEBlitToSurfaceWithShadow=H1PAL_InternalRLEShadow',
                 '-DPAL_RLEBlitWithColorShift=H1PAL_InternalRLEShift','-DPAL_RLEBlitMonoColor=H1PAL_InternalRLEMono']}
         if source.parent==core:extra+=rename.get(source.name,[])
+        if source==overrides.get('aviplay.c'):extra+=rename['aviplay.c']
         if args.regression and source==core/'main.c':extra+=['-DUNIT_TEST','-DUNIT_TEST_GAME_INIT']
         cmd=[tc/('mipsel-none-elf-g++.exe' if cpp else 'mipsel-none-elf-gcc.exe'),*flags,*extra,'-c',source,'-o',obj]
         digest=hashlib.sha256(BUILD_EPOCH.encode()+str(cmd).encode()+source.read_bytes()+headers).hexdigest();stamp=obj.with_suffix('.sha256')
@@ -70,6 +74,7 @@ def main():
         'icon_sha256':hashlib.sha256((ROOT/'assets/icon.png').read_bytes()).hexdigest(),'source_date_epoch':int(BUILD_EPOCH),
         'sha256':hashlib.sha256(data).hexdigest(),'size':len(data),'regression':args.regression,
         'engine_commit':ENGINE_COMMIT,'sdk_commit':SDK_COMMIT,
+        'h264_commit':H264_COMMIT,
         'reference_commit':'10532f74ced55061b6147538dee80797527fb203','symbols':symbols,'hardware_verified':False,
         'sources':{p.relative_to(ROOT).as_posix():hashlib.sha256(p.read_bytes()).hexdigest() for d in (ROOT/'src',ROOT/'tools') for p in sorted(d.rglob('*')) if p.is_file() and p.suffix in ('.c','.h','.S','.cpp','.py','.ld')}}
     bda.with_suffix('.build.json').write_text(json.dumps(meta,indent=2)+'\n')

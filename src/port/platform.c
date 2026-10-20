@@ -21,6 +21,8 @@ static unsigned width=435,height=272,left=22,top=0;
 static unsigned logical_width=320,logical_height=200;
 static int extended_map,map_full;
 static uint16_t xmap[480],ymap[272];
+static uint16_t movie_xmap[480],movie_ymap[272];
+static unsigned movie_w,movie_h,movie_display_w,movie_display_h;
 static void *gui(unsigned o){return h1_runtime_entry(h1_runtime_table(H1_RUNTIME_GUI_TABLE_SLOT),o);}
 static int down(unsigned k){return h1_game_code_down(h1_game_key_code(k));}
 static void geometry(void){
@@ -62,8 +64,13 @@ void h1pal_platform_present(const SDL_Surface *s){
 void h1pal_platform_present_rgb555(const Uint16 *pixels,int w,int h,int pitch){
  if(!lcd||!pixels||w<1||h<1||pitch<w)return;SDL_H1AudioPump();
  if(extended_map){extended_map=0;geometry();}
- for(unsigned y=0;y<height;++y){const uint16_t *in=pixels+(y*(unsigned)h/height)*pitch;volatile uint32_t *out=lcd+(top+y)*480+left;
- for(unsigned x=0;x<width;++x){unsigned c=in[x*(unsigned)w/width],r=(c>>10)&31,g=(c>>5)&31,b=c&31;out[x]=(((r<<3)|(r>>2))<<16)|(((g<<3)|(g>>2))<<8)|(b<<3)|(b>>2);}}
+ if(movie_w!=(unsigned)w||movie_h!=(unsigned)h||movie_display_w!=width||movie_display_h!=height){
+  movie_w=w;movie_h=h;movie_display_w=width;movie_display_h=height;
+  for(unsigned x=0;x<width;++x)movie_xmap[x]=x*(unsigned)w/width;
+  for(unsigned y=0;y<height;++y)movie_ymap[y]=y*(unsigned)h/height;
+ }
+ for(unsigned y=0;y<height;++y){const uint16_t *in=pixels+movie_ymap[y]*pitch;volatile uint32_t *out=lcd+(top+y)*480+left;
+ for(unsigned x=0;x<width;++x){unsigned c=in[movie_xmap[x]],r=(c>>10)&31,g=(c>>5)&31,b=c&31;out[x]=(((r<<3)|(r>>2))<<16)|(((g<<3)|(g>>2))<<8)|(b<<3)|(b>>2);}}
  ++h1pal_stats.frames;SDL_H1AudioPump();
 }
 static int absolute(int n){return n<0?-n:n;}

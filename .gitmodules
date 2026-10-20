@@ -4,3 +4,6 @@
 [submodule "third_party/sdlpal"]
 	path = third_party/sdlpal
 	url = https://github.com/sdlpal/sdlpal.git
+[submodule "third_party/h264bsd"]
+	path = third_party/h264bsd
+	url = https://github.com/oneam/h264bsd.git

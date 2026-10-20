@@ -6,14 +6,33 @@ contexts change; generated C retains the original copyright/license headers.
 def generate(core, directory):
     directory.mkdir(parents=True, exist_ok=True)
     output = {}
-    for name in ('scene.c', 'rngplay.c', 'battle.c', 'video.c', 'uigame.c', 'magicmenu.c', 'itemmenu.c'):
+    for name in ('scene.c', 'rngplay.c', 'battle.c', 'video.c', 'uigame.c', 'magicmenu.c', 'itemmenu.c', 'aviplay.c'):
         text = (core / name).read_text(encoding='utf-8')
         def replace(old, new):
             nonlocal text
             assert text.count(old) == 1, (name, old, text.count(old))
             text = text.replace(old, new)
-        replace('#include "main.h"', '#include "main.h"\n#include "wide_scene.h"')
-        if name == 'scene.c':
+        if name == 'aviplay.c':
+            replace('#include "palcfg.h"', '#include "palcfg.h"\n#include "h264_video.h"\n#define H1PAL_VIDS_H264 0x34363248u')
+            replace('BOOL          fInterleaved;', 'BOOL          fInterleaved;\n    uint32_t h1codec;')
+            replace('(streamHeader.fccHandler != VIDS_MSVC && streamHeader.fccHandler != VIDS_msvc)',
+                    '(streamHeader.fccHandler != VIDS_MSVC && streamHeader.fccHandler != VIDS_msvc && streamHeader.fccHandler != H1PAL_VIDS_H264)')
+            replace('if (bih.biBitCount != 16)', 'avi->h1codec = streamHeader.fccHandler;\n                    if (avi->h1codec != H1PAL_VIDS_H264 && bih.biBitCount != 16)')
+            replace('bih.biWidth, bih.biHeight, bih.biBitCount,', 'bih.biWidth, bih.biHeight, 16,')
+            replace('chunk->header = hdr.chunk;', 'chunk->header = hdr.chunk;\n            if (hdr.length & 1u) fseek(fp, 1, SEEK_CUR);')
+            replace('fseek(fp, pos += hdr.length, SEEK_SET);', 'fseek(fp, pos += hdr.length + (hdr.length & 1u), SEEK_SET);')
+            # Preserve the AVI timeline instead of adding each timer overshoot
+            # to the next frame, which slowly lets video fall behind PCM.
+            replace('dwFrameStartTime = SDL_GetTicks();', 'dwFrameStartTime = dwNextFrameTime;')
+            replace('PAL_RenderAVIFrameToSurface(avi->surface, chunk);',
+                    'if (avi->h1codec == H1PAL_VIDS_H264) {\n'
+                    '                if (!h1pal_h264_decode(avi->surface, chunk->data, chunk->header.length)) { fEndPlay = TRUE; break; }\n'
+                    '            } else PAL_RenderAVIFrameToSurface(avi->surface, chunk);')
+        else:
+            replace('#include "main.h"', '#include "main.h"\n#include "wide_scene.h"')
+        if name == 'aviplay.c':
+            pass
+        elif name == 'scene.c':
             replace('if (x >= 320 ||', 'if (x >= gpScreen->w ||')
             replace('if (vy >= 200 ||', 'if (vy >= gpScreen->h ||')
             replace('BYTE                 buf[320];', 'BYTE                 buf[H1PAL_MAP_WIDTH];')
