@@ -9,5 +9,5 @@ unsigned h1pal_keymap_action(unsigned key, int defaults);
 void h1pal_keymap_load(void);
 int h1pal_keymap_assign(unsigned action, unsigned key);
 int h1pal_keymap_restore(void);
-void H1PAL_SettingsMenu(void);
+void H1PAL_KeymapMenu(void);
 #endif

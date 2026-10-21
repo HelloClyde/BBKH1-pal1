@@ -13,8 +13,8 @@ def generate(core, directory):
             assert text.count(old) == 1, (name, old, text.count(old))
             text = text.replace(old, new)
         if name == 'text.c':
-            replace(r'L"\x8FD4\x56DE\x8A2D\x5B9A"', r'L"\x7CFB\x7D71\x8A2D\x5B9A"')
-            replace(r'L"\x8FD4\x56DE\x8BBE\x7F6E"', r'L"\x7CFB\x7EDF\x8BBE\x7F6E"')
+            replace(r'L"\x8FD4\x56DE\x8A2D\x5B9A"', r'L"\x6309\x9375\x6620\x5C04"')
+            replace(r'L"\x8FD4\x56DE\x8BBE\x7F6E"', r'L"\x6309\x952E\x6620\x5C04"')
         elif name == 'aviplay.c':
             replace('#include "palcfg.h"', '#include "palcfg.h"\n#include "h264_video.h"\n#define H1PAL_VIDS_H264 0x34363248u')
             replace('BOOL          fInterleaved;', 'BOOL          fInterleaved;\n    uint32_t h1codec;')
@@ -66,19 +66,14 @@ def generate(core, directory):
                     '            ((LPBYTE)(gpScreenBak->pixels))[k] = ((a & 0xF0) | (b & 0x0F));\n         }\n         h1pal_scene_fade(gpScreen, gpScreenBak, rgIndex[j], i);')
         elif name == 'uigame.c':
             replace('#include "main.h"', '#include "main.h"\n#include "keymap.h"')
-            begin = text.index('#if PAL_HAS_CONFIG_PAGE', text.index('PAL_QuitGame(\n'))
-            end = text.index('\n}', begin)
-            replace(text[begin:end], '''    for (;;) {
-        WORD choice = PAL_TripleMenu(SYSMENU_LABEL_LAUNCHSETTING);
-        if (choice == 2) { H1PAL_SettingsMenu(); continue; }
-        if (choice == 1) {
-            PAL_SaveConfig();
-            AUDIO_PlayMusic(0, FALSE, 2);
-            PAL_FadeOut(2);
-            PAL_Shutdown(0);
-        }
-        break;
-    }''')
+            replace('      { 5,      SYSMENU_LABEL_QUIT,          TRUE,     PAL_XY(53, 72 + 72) },',
+                    '      { 5,      SYSMENU_LABEL_LAUNCHSETTING, TRUE,     PAL_XY(53, 72 + 72) },\n'
+                    '      { 6,      SYSMENU_LABEL_QUIT,          TRUE,     PAL_XY(53, 72 + 90) },')
+            replace('      { 6,      SYSMENU_LABEL_BATTLEMODE,    TRUE,     PAL_XY(53, 72 + 90) },',
+                    '      { 7,      SYSMENU_LABEL_BATTLEMODE,    TRUE,     PAL_XY(53, 72 + 108) },')
+            replace('   case 6:\n      //\n      // Battle Mode', '   case 7:\n      //\n      // Battle Mode')
+            replace('   case 5:\n      //\n      // Quit',
+                    '   case 5:\n      H1PAL_KeymapMenu();\n      break;\n\n   case 6:\n      //\n      // Quit')
             replace('   PAL_FBPBlitToSurface(buf, gpScreen);',
                     '   PAL_FBPBlitToSurface(buf, gpScreen);\n   h1pal_ui_background(gpScreen, 1);')
             old = '      PAL_FBPBlitToSurface(bufBackground, gpScreen);'

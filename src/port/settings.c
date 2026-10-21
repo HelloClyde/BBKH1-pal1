@@ -49,7 +49,7 @@ static int wait_key(void)
     PAL_ClearKeyState();
     return key;
 }
-static void keymap_menu(void)
+void H1PAL_KeymapMenu(void)
 {
     SDL_Surface *s = backup();
     if (!s) return;
@@ -57,6 +57,7 @@ static void keymap_menu(void)
     int capturing = 0, dirty = 1;
     BYTE color = 0;
     const WCHAR *message = L"方向选择 输入改键 跳出返回";
+    h1pal_platform_settings_input(1);
     reset_input();
     for (;;) {
         BYTE next_color = MENUITEM_COLOR_SELECTED;
@@ -102,37 +103,6 @@ static void keymap_menu(void)
         SDL_Delay(10);
     }
     h1pal_platform_capture_keys(0);
-    reset_input(); restore(s); SDL_FreeSurface(s); VIDEO_UpdateScreen(NULL);
-}
-void H1PAL_SettingsMenu(void)
-{
-    SDL_Surface *s = backup();
-    if (!s) return;
-    unsigned selected = 0;
-    int dirty = 1;
-    BYTE color = 0;
-    h1pal_platform_settings_input(1);
-    reset_input();
-    for (;;) {
-        BYTE next_color = MENUITEM_COLOR_SELECTED;
-        if (dirty || color != next_color) {
-            color = next_color; dirty = 0;
-            panel(s, L"系统设置");
-            text(L"按键映射", 128, 68, selected == 0 ? color : MENUITEM_COLOR);
-            text(L"返回", 128, 106, selected == 1 ? color : MENUITEM_COLOR);
-            h1pal_ui_cursor(gpScreen, 128, selected == 0 ? 68 : 106);
-            text(L"方向选择 输入确定 跳出返回", 32, 178, MENUITEM_COLOR);
-            VIDEO_UpdateScreen(NULL);
-        }
-        unsigned keys = wait_key();
-        if (keys & kKeyMenu) break;
-        if (keys & (kKeyUp | kKeyDown | kKeyLeft | kKeyRight)) { selected ^= 1; dirty = 1; }
-        else if (keys & kKeySearch) {
-            if (selected == 1) break;
-            keymap_menu(); dirty = 1;
-        }
-        SDL_Delay(10);
-    }
     reset_input();
     h1pal_platform_settings_input(0);
     SDL_H1ResetInputState(); PAL_ClearKeyState();
