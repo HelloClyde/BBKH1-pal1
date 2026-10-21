@@ -4,6 +4,7 @@
 #include "native_audio.h"
 #include "platform.h"
 #include "pal_config.h"
+#include "keymap.h"
 #include <setjmp.h>
 #include <stdarg.h>
 #include <stdio.h>
@@ -21,8 +22,9 @@ extern int h1pal_engine_main(void);
 int h1_app_main(void) {
     if(!setjmp(return_point)) {
         h1pal_select_data_path();
+        h1pal_keymap_load();
         FILE *f=h1pal_fopen_data("H1PAL.LOG","wb");if(f)fclose(f);
-        h1pal_log("H1PAL 0.1.7 BEGIN");
+        h1pal_log("H1PAL 0.1.8 BEGIN");
         h1pal_log("DATA_PATH %s",PAL_H1_DATA_PATH);
         exit_status=h1pal_engine_main();
     }

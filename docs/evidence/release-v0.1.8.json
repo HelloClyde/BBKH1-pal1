@@ -1,0 +1,431 @@
+{
+  "version": "0.1.8",
+  "date": "2026-10-21",
+  "bda_sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+  "sdk_commit": "067fe072477861dfc8949d7b1a55279fb92d2548",
+  "sdlpal_commit": "224cb0a0cc839e0e8ecaa299cd480b02b372b9f7",
+  "h264bsd_commit": "42bcb5d753ad86d84903354bf3c68423c28adb7b",
+  "source_date_epoch": 1792368000,
+  "exact_bda_full_firmware_checked": true,
+  "full_firmware_in_ci": false,
+  "hardware_verified": false,
+  "game_resources_in_source": false,
+  "full_firmware_scope": "A volume: old-save map, quit/settings/keymap, bind confirm X/cancel Z, clean menu quit, relaunch reload, restore defaults and clean exit",
+  "checks": {
+    "keymap": {
+      "ok": true,
+      "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+      "six_actions": true,
+      "held_and_event_paths": true,
+      "duplicate_swap": true,
+      "fixed_settings_navigation": true,
+      "raw_capture_and_aliases": true,
+      "selected_volume_persistence": [
+        "A",
+        "B"
+      ],
+      "fresh_process_reload": true,
+      "restore_defaults": true,
+      "invalid_config_fallback": true,
+      "save_failure_preserves_active_mapping": true,
+      "physical_emergency_exit": true,
+      "clean_exit": true
+    },
+    "settings-ui": {
+      "ok": true,
+      "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+      "kind": "actual MIPS BDA, owner PAL UI assets",
+      "quit_settings_keymap_path": true,
+      "captured_confirm_x_cancel_z": true,
+      "original_border_font_palette": true,
+      "fullscreen": [
+        480,
+        272
+      ],
+      "background_restored": true,
+      "clean_exit": true,
+      "screenshots": [
+        "quit-settings",
+        "system-settings",
+        "keymap-default",
+        "keymap-capture",
+        "keymap-confirm-x",
+        "keymap-custom"
+      ]
+    },
+    "display-controls": {
+      "ok": true,
+      "six_controls": true,
+      "letter_space_shortcuts_ignored": true,
+      "fixed_artwork_aspect": true,
+      "engine_canvas_corners": true,
+      "avi_corners": true,
+      "touch_coordinates": true,
+      "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10"
+    },
+    "wide-ui": {
+      "ok": true,
+      "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+      "fullscreen": [
+        480,
+        272
+      ],
+      "central_status_pixels_identical": true,
+      "title_uniform_cover": true,
+      "portrait_slot_geometry_preserved": true,
+      "uniform_display": "4/3",
+      "backup_restore": true,
+      "icon_at_new_edge": true,
+      "cursor_no_text_overlap": true,
+      "fixed_fullscreen": true,
+      "clean_exit": true,
+      "seconds": 0.7
+    },
+    "wide-battle": {
+      "ok": true,
+      "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+      "background_scale": "9/8",
+      "display_scale": "4/3",
+      "fullscreen": [
+        480,
+        272
+      ],
+      "coordinate_grid_verified": true,
+      "four_rle_variants_at_edge": true,
+      "palette_shift": true,
+      "max_wave": true,
+      "fixed_fullscreen": true,
+      "clean_exit": true,
+      "seconds": 1.33
+    },
+    "music": {
+      "ok": true,
+      "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+      "kind": "actual MIPS RIX/DBOPL mixer; no sound effects",
+      "fixture": "original synthetic RIX",
+      "tracks": [
+        {
+          "track": 1,
+          "peak": 4072,
+          "rms": 2955.13
+        }
+      ],
+      "mute_resume_stop": true,
+      "clean_exit": true
+    },
+    "h264-video": {
+      "ok": true,
+      "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+      "fixture": "original synthetic 64x48 H.264 Baseline and PCM sine",
+      "decoded_rgb555_matches_reference": true,
+      "frames": 8,
+      "reopen_movie": true,
+      "skip_with_cancel": true,
+      "unsupported_profile_clean_failure": true,
+      "nonzero_audio": true,
+      "clean_exit": true
+    },
+    "data-drives": {
+      "ok": true,
+      "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+      "kind": "actual MIPS filesystem with modeled H1 A/B volumes",
+      "cases": [
+        {
+          "case": "A only",
+          "selected": "A",
+          "ok": true
+        },
+        {
+          "case": "B only",
+          "selected": "B",
+          "ok": true
+        },
+        {
+          "case": "A wins",
+          "selected": "A",
+          "ok": true
+        },
+        {
+          "case": "A folder without main",
+          "selected": "B",
+          "ok": true
+        },
+        {
+          "case": "B ignores A video",
+          "selected": "B",
+          "ok": true
+        },
+        {
+          "case": "missing both",
+          "selected": "A",
+          "ok": true
+        },
+        {
+          "case": "damaged A is not replaced with B",
+          "selected": "A",
+          "ok": true
+        }
+      ],
+      "selected_volume_saves_config_log": true,
+      "video_stays_on_selected_volume": true,
+      "clean_handles": true
+    },
+    "missing": {
+      "ok": true,
+      "kind": "cross-compiled MIPS with modeled H1 services",
+      "missing": true,
+      "stats": [
+        827081040,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        1
+      ],
+      "seconds": 0.41,
+      "seeks": 0,
+      "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+      "leaked_handles": 0,
+      "leaked_allocations": 0
+    }
+  },
+  "native_A": {
+    "ok": true,
+    "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+    "kind": "private complete H1 V1.41 firmware under QEMU, A volume",
+    "quit_settings_keymap_path": true,
+    "original_pal_border_font_palette": true,
+    "custom_bindings": [
+      37,
+      27,
+      40,
+      35,
+      17,
+      16
+    ],
+    "confirm_x_cancel_z_work": true,
+    "clean_menu_exit": true,
+    "application_relaunch_persistence": true,
+    "restored_defaults": [
+      37,
+      27,
+      40,
+      35,
+      25,
+      24
+    ],
+    "screens": {
+      "quit-menu": {
+        "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+        "position": [
+          13632736,
+          7340192
+        ],
+        "stats": [
+          827081040,
+          1,
+          597,
+          2,
+          0,
+          1050,
+          0,
+          0
+        ],
+        "width": 480,
+        "height": 272,
+        "logical_width": 360,
+        "logical_height": 204,
+        "map_full": 1,
+        "opened": 1
+      },
+      "system-settings": {
+        "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+        "position": [
+          13632736,
+          7340192
+        ],
+        "stats": [
+          827081040,
+          1,
+          729,
+          2,
+          0,
+          1251,
+          0,
+          0
+        ],
+        "width": 480,
+        "height": 272,
+        "logical_width": 360,
+        "logical_height": 204,
+        "map_full": 1,
+        "opened": 1
+      },
+      "keymap-default": {
+        "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+        "position": [
+          13632736,
+          7340192
+        ],
+        "stats": [
+          827081040,
+          1,
+          734,
+          2,
+          0,
+          1271,
+          0,
+          0
+        ],
+        "width": 480,
+        "height": 272,
+        "logical_width": 360,
+        "logical_height": 204,
+        "map_full": 1,
+        "opened": 1
+      },
+      "keymap-custom": {
+        "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+        "position": [
+          13632736,
+          7340192
+        ],
+        "stats": [
+          827081040,
+          1,
+          780,
+          6,
+          0,
+          1431,
+          0,
+          0
+        ],
+        "width": 480,
+        "height": 272,
+        "logical_width": 360,
+        "logical_height": 204,
+        "map_full": 1,
+        "opened": 1
+      },
+      "exit-custom": {
+        "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+        "position": [
+          0,
+          0
+        ],
+        "stats": [
+          827081040,
+          1,
+          1025,
+          7,
+          0,
+          2096,
+          0,
+          0
+        ],
+        "width": 480,
+        "height": 272,
+        "logical_width": 360,
+        "logical_height": 204,
+        "map_full": 1,
+        "opened": 0
+      },
+      "relaunch-map": {
+        "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+        "position": [
+          13632736,
+          7340192
+        ],
+        "stats": [
+          827081040,
+          1,
+          344,
+          1,
+          0,
+          623,
+          0,
+          0
+        ],
+        "width": 480,
+        "height": 272,
+        "logical_width": 360,
+        "logical_height": 204,
+        "map_full": 1,
+        "opened": 1
+      },
+      "keymap-reloaded": {
+        "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+        "position": [
+          13632736,
+          7340192
+        ],
+        "stats": [
+          827081040,
+          1,
+          519,
+          2,
+          0,
+          859,
+          0,
+          0
+        ],
+        "width": 480,
+        "height": 272,
+        "logical_width": 360,
+        "logical_height": 204,
+        "map_full": 1,
+        "opened": 1
+      },
+      "keymap-restored": {
+        "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+        "position": [
+          13632736,
+          7340192
+        ],
+        "stats": [
+          827081040,
+          1,
+          563,
+          4,
+          0,
+          976,
+          0,
+          0
+        ],
+        "width": 480,
+        "height": 272,
+        "logical_width": 360,
+        "logical_height": 204,
+        "map_full": 1,
+        "opened": 1
+      },
+      "exit-final": {
+        "sha256": "881cb875ad2cc0d63bf8536fe8127ea8e14d63b8575a83568aaecf5271bd2a10",
+        "position": [
+          0,
+          0
+        ],
+        "stats": [
+          827081040,
+          1,
+          618,
+          4,
+          0,
+          1068,
+          0,
+          0
+        ],
+        "width": 480,
+        "height": 272,
+        "logical_width": 360,
+        "logical_height": 204,
+        "map_full": 1,
+        "opened": 0
+      }
+    },
+    "hardware_verified": false
+  },
+  "resource_changes": false
+}

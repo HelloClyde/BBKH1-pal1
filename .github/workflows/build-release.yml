@@ -54,6 +54,8 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tests/display_controls.py
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python tests/keymap.py
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tests/music.py
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tests/h264_video.py

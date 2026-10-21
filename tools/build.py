@@ -33,7 +33,7 @@ def main():
     flags += [v for p in includes for v in ('-I',str(p))]
     sources=[ROOT/'src'/p for p in ('runtime/entry.S','runtime/startup.c','runtime/setjmp.S','runtime/cxx_runtime.cpp',
         'libc/runtime.c','compat/mini_sdl.c','port/platform.c','port/native_audio.c','port/app.c',
-        'port/autopath.c','port/audio_stub.c','port/avi_9588.c','port/h264_video.c','port/pal_utils.c','port/regression.c','port/bda_main.c','port/wide_scene.c','port/wide_battle.c','port/wide_ui.c')]
+        'port/autopath.c','port/audio_stub.c','port/avi_9588.c','port/h264_video.c','port/keymap.c','port/settings.c','port/pal_utils.c','port/regression.c','port/bda_main.c','port/wide_scene.c','port/wide_battle.c','port/wide_ui.c')]
     names='audio aviplay battle ending fight font game global input itemmenu magicmenu main map midi palette palcfg palcommon play res rngplay scene script text resampler sound ui uibattle uigame util video yj1'.split()
     from core_overrides import generate
     overrides=generate(core,build/'core')

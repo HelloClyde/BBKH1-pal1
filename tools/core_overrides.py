@@ -6,13 +6,16 @@ contexts change; generated C retains the original copyright/license headers.
 def generate(core, directory):
     directory.mkdir(parents=True, exist_ok=True)
     output = {}
-    for name in ('scene.c', 'rngplay.c', 'battle.c', 'video.c', 'uigame.c', 'magicmenu.c', 'itemmenu.c', 'aviplay.c'):
+    for name in ('scene.c', 'rngplay.c', 'battle.c', 'video.c', 'uigame.c', 'magicmenu.c', 'itemmenu.c', 'aviplay.c', 'text.c'):
         text = (core / name).read_text(encoding='utf-8')
         def replace(old, new):
             nonlocal text
             assert text.count(old) == 1, (name, old, text.count(old))
             text = text.replace(old, new)
-        if name == 'aviplay.c':
+        if name == 'text.c':
+            replace(r'L"\x8FD4\x56DE\x8A2D\x5B9A"', r'L"\x7CFB\x7D71\x8A2D\x5B9A"')
+            replace(r'L"\x8FD4\x56DE\x8BBE\x7F6E"', r'L"\x7CFB\x7EDF\x8BBE\x7F6E"')
+        elif name == 'aviplay.c':
             replace('#include "palcfg.h"', '#include "palcfg.h"\n#include "h264_video.h"\n#define H1PAL_VIDS_H264 0x34363248u')
             replace('BOOL          fInterleaved;', 'BOOL          fInterleaved;\n    uint32_t h1codec;')
             replace('(streamHeader.fccHandler != VIDS_MSVC && streamHeader.fccHandler != VIDS_msvc)',
@@ -30,7 +33,7 @@ def generate(core, directory):
                     '            } else PAL_RenderAVIFrameToSurface(avi->surface, chunk);')
         else:
             replace('#include "main.h"', '#include "main.h"\n#include "wide_scene.h"')
-        if name == 'aviplay.c':
+        if name in ('aviplay.c', 'text.c'):
             pass
         elif name == 'scene.c':
             replace('if (x >= 320 ||', 'if (x >= gpScreen->w ||')
@@ -62,6 +65,20 @@ def generate(core, directory):
             replace('            ((LPBYTE)(gpScreenBak->pixels))[k] = ((a & 0xF0) | (b & 0x0F));\n         }',
                     '            ((LPBYTE)(gpScreenBak->pixels))[k] = ((a & 0xF0) | (b & 0x0F));\n         }\n         h1pal_scene_fade(gpScreen, gpScreenBak, rgIndex[j], i);')
         elif name == 'uigame.c':
+            replace('#include "main.h"', '#include "main.h"\n#include "keymap.h"')
+            begin = text.index('#if PAL_HAS_CONFIG_PAGE', text.index('PAL_QuitGame(\n'))
+            end = text.index('\n}', begin)
+            replace(text[begin:end], '''    for (;;) {
+        WORD choice = PAL_TripleMenu(SYSMENU_LABEL_LAUNCHSETTING);
+        if (choice == 2) { H1PAL_SettingsMenu(); continue; }
+        if (choice == 1) {
+            PAL_SaveConfig();
+            AUDIO_PlayMusic(0, FALSE, 2);
+            PAL_FadeOut(2);
+            PAL_Shutdown(0);
+        }
+        break;
+    }''')
             replace('   PAL_FBPBlitToSurface(buf, gpScreen);',
                     '   PAL_FBPBlitToSurface(buf, gpScreen);\n   h1pal_ui_background(gpScreen, 1);')
             old = '      PAL_FBPBlitToSurface(bufBackground, gpScreen);'

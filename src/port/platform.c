@@ -6,12 +6,15 @@
 #include "app.h"
 #include "pal_config.h"
 #include "wide_scene.h"
+#include "keymap.h"
 #include <stdio.h>
 #include <string.h>
 static int opened,timer,closing;
 static volatile uint32_t *lcd;
 static unsigned sampled,latched,combo_started;
 static int combo;
+static int settings_input,capturing_keys;
+static unsigned captured_key;
 static int touch_active,touch_x,touch_y,touch_last_x,touch_last_y,touch_moved;
 static unsigned touch_started,tap_time;
 static int tap_pending,tap_x,tap_y;
@@ -89,12 +92,15 @@ void h1pal_platform_pump(void){
  for(unsigned i=0;i<32;++i){int event=-1,value=-1;h1_event_fetch(&event,&value);if(event==-1&&value==-1)break;
  if(event==11||event==12||event==8)touch_event(event);
  if(event==H1_EVENT_KEY_DOWN){++h1pal_stats.keys;if(value==H1_KEY_BACK)closing=1;
- unsigned bit=0;switch(value){case H1_KEY_UP:bit=1;break;case H1_KEY_DOWN:bit=2;break;case H1_KEY_LEFT:bit=4;break;case H1_KEY_RIGHT:bit=8;break;
- case H1_KEY_ENTER:case H1_KEY_CONFIRM:bit=16;break;case H1_KEY_ESCAPE:bit=32;break;}latched|=bit;}}
+ if(capturing_keys&&!captured_key)captured_key=h1pal_keymap_normalize(value);
+ latched|=h1pal_keymap_action(value,settings_input);}}
  if(touch_active)touch_event(12);
- unsigned keys=(down(H1_KEY_UP)?1:0)|(down(H1_KEY_DOWN)?2:0)|(down(H1_KEY_LEFT)?4:0)|(down(H1_KEY_RIGHT)?8:0)|(down(H1_KEY_ENTER)?16:0)|(down(H1_KEY_ESCAPE)?32:0);
+ unsigned keys=0;
+ for(unsigned i=0;i<H1PAL_KEY_COUNT;++i)if(down(settings_input?h1pal_keymap_default(i):h1pal_keymap_get(i)))keys|=1u<<i;
+ if(capturing_keys&&!captured_key)for(unsigned key=1;key<=40;++key)if(h1pal_keymap_normalize(key)==key&&down(key)){captured_key=key;break;}
  latched|=keys&~sampled;sampled=keys;
- if((keys&48)==48){if(!combo){combo=1;combo_started=h1pal_platform_ticks();}else if(h1pal_platform_ticks()-combo_started>=1500)closing=1;}else combo=0;
+ /* The emergency exit remains tied to physical Enter+Escape, regardless of mappings. */
+ if(down(H1_KEY_ENTER)&&down(H1_KEY_ESCAPE)){if(!combo){combo=1;combo_started=h1pal_platform_ticks();}else if(h1pal_platform_ticks()-combo_started>=1500)closing=1;}else combo=0;
 }
 unsigned h1pal_platform_keys(void){h1pal_platform_pump();unsigned keys=sampled|latched;latched=0;return keys;}
 int h1pal_platform_detached(void){return closing;}
@@ -104,6 +110,16 @@ void h1pal_platform_wait_action_release(void){
  do{h1pal_platform_pump();SDL_H1AudioPump();if(sampled&48)quiet=h1pal_platform_ticks();}
  while(!closing&&h1pal_platform_ticks()-quiet<120);
  latched=0;
+}
+void h1pal_platform_settings_input(int enabled){settings_input=enabled;sampled=latched=0;tap_pending=0;touch_active=0;}
+void h1pal_platform_capture_keys(int enabled){capturing_keys=enabled;captured_key=0;}
+unsigned h1pal_platform_take_capture_key(void){unsigned key=captured_key;captured_key=0;return key;}
+void h1pal_platform_wait_input_release(void){
+ unsigned quiet=h1pal_platform_ticks();
+ do{h1pal_platform_pump();SDL_H1AudioPump();
+  for(unsigned key=1;key<=40;++key)if(h1pal_keymap_normalize(key)==key&&down(key)){quiet=h1pal_platform_ticks();break;}
+ }while(!closing&&h1pal_platform_ticks()-quiet<120);
+ sampled=latched=captured_key=0;
 }
 void H1PAL_FatalOutput(const char *message){
  h1pal_stats.error=1;h1pal_log("FATAL %s",message?message:"");h1pal_platform_close();
