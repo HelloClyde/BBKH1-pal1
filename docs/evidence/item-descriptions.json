@@ -1,0 +1,70 @@
+{
+  "ok": true,
+  "kind": "actual MIPS BDA with modeled H1 services; owner resources",
+  "bda_sha256": "8bf2d9a7df8c637243e864c733d1a1591c103661fc2da8040f88f50bc41230e2",
+  "resource_sha256": "1cd232c865476a9f4c0fd07eb81a2515cb7a9c4d1ef928e1ebc7f500350f4b6a",
+  "resource_size": 27184432,
+  "archive_members": 22,
+  "unchanged_original_members": 21,
+  "description_sha256": "0d6487d6832488130bc94b1ec5ee71766717b929c249693327089e461460ae40",
+  "description_size": 16027,
+  "description_count": 296,
+  "source_bytes_preserved": true,
+  "all_descriptions_loaded": true,
+  "all_description_glyphs_present": true,
+  "unique_description_glyphs": 941,
+  "max_lines": 3,
+  "fullscreen": [
+    480,
+    272
+  ],
+  "examples": [
+    {
+      "object_id": "0x65",
+      "name": "金創藥",
+      "lines": [
+        {
+          "text": "上等刀傷藥，去腐生肌。",
+          "x": 75,
+          "y": 150
+        },
+        {
+          "text": "HP+200",
+          "x": 75,
+          "y": 166
+        }
+      ],
+      "screenshot": "medicine.png"
+    },
+    {
+      "object_id": "0xa6",
+      "name": "木劍",
+      "lines": [
+        {
+          "text": "用木材雕刻的劍，小孩玩具。",
+          "x": 75,
+          "y": 150
+        },
+        {
+          "text": "武術+2 身法+3",
+          "x": 75,
+          "y": 166
+        }
+      ],
+      "screenshot": "equipment.png"
+    },
+    {
+      "object_id": "0x10e",
+      "name": "紫金葫蘆",
+      "lines": [
+        {
+          "text": "收妖煉丹，需與靈葫咒配合。",
+          "x": 75,
+          "y": 150
+        }
+      ],
+      "screenshot": "quest-item.png"
+    }
+  ],
+  "clean_exit": true
+}

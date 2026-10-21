@@ -38,16 +38,29 @@ def main():
     ap.add_argument('--output',type=Path,default=ROOT/'build/steam-resources')
     ap.add_argument('--video-codec',choices=('h264','original'),default='h264')
     ap.add_argument('--crf',type=int,default=18,choices=range(12,29),metavar='12..28')
+    ap.add_argument('--core-only',action='store_true',help='rebuild only PAL9588.PAK, without processing videos')
+    ap.add_argument('--descriptions',type=Path,help='optional matching description file; Steam DOS defaults to PAL/desc_cht.dat')
     args=ap.parse_args();out=args.output.resolve();core=out/'core';video=out/'video'
     if out.is_relative_to(args.steam_root.resolve()):raise ValueError('Output must be outside the original Steam installation')
-    for d in (core,video):d.mkdir(parents=True,exist_ok=True)
+    core.mkdir(parents=True,exist_ok=True)
+    if not args.core_only:video.mkdir(parents=True,exist_ok=True)
     dos=args.steam_root/'PAL_DOS';pal98=args.steam_root/'PAL98'
     inputs={p.name.lower():p for p in dos.iterdir() if p.is_file()}
     for name in CORE:shutil.copyfile(inputs[name.lower()],core/name)
+    descriptions=args.descriptions or args.steam_root/'PAL/desc_cht.dat'
+    description_report=None
+    if descriptions.is_file():
+        # Keep the supplied Big5 text and Eric-Chen attribution byte-for-byte.
+        # Steam's original PAL_DOS word/font resources use Traditional Chinese.
+        shutil.copyfile(descriptions,core/'desc.dat')
+        description_report={'source':str(descriptions),'archive_name':'desc.dat','size':descriptions.stat().st_size,'sha256':sha(descriptions)}
+    elif args.descriptions:raise FileNotFoundError(descriptions)
+    elif (core/'desc.dat').exists():
+        raise ValueError('Stale desc.dat in output: use a fresh output directory or --descriptions')
     spec=importlib.util.spec_from_file_location('prepare_avi',ROOT/'tools/prepare-pal-avi.py')
     normalizer=importlib.util.module_from_spec(spec);spec.loader.exec_module(normalizer)
     reports=[]
-    for i in range(1,7):
+    for i in ([] if args.core_only else range(1,7)):
         src=pal98/f'{i}.AVI';dest=video/f'{i}.avi'
         if args.video_codec=='h264':transcode_h264(src,dest,args.crf)
         else:shutil.copyfile(src,dest)
@@ -67,10 +80,12 @@ def main():
             'video_bit_exact':args.video_codec=='original','video_reencoded':args.video_codec=='h264','audio_bit_exact':True,
             'crf':args.crf if args.video_codec=='h264' else None,'largest_chunk':largest,**prepared}
         reports.append(report);print(src.name,args.video_codec,'bytes',dest.stat().st_size,flush=True)
-    for source,name in ((core,'PAL9588.PAK'),(video,'PALVIDEO.PAK')):
+    packages=[(core,'PAL9588.PAK')]+([] if args.core_only else [(video,'PALVIDEO.PAK')])
+    for source,name in packages:
         pack_directory(source,out/name);verify_archive(out/name)
-    report={'steam_root':str(args.steam_root),'core_files':len(CORE),'videos':reports,
-        'packages':{name:{'size':(out/name).stat().st_size,'sha256':sha(out/name)} for name in ('PAL9588.PAK','PALVIDEO.PAK')}}
+    report={'steam_root':str(args.steam_root),'core_files':len(CORE)+(1 if (core/'desc.dat').is_file() else 0),
+        'descriptions':description_report,'videos':reports,
+        'packages':{name:{'size':(out/name).stat().st_size,'sha256':sha(out/name)} for _,name in packages}}
     (out/'steam-resources.json').write_text(json.dumps(report,indent=2)+'\n',encoding='utf-8')
     print(json.dumps(report['packages'],indent=2))
 if __name__=='__main__':main()

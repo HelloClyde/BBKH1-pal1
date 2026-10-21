@@ -41,6 +41,10 @@ are provided as separate Release attachments, rebuilt from the user's Steam
 installation. Their original rights are retained; the source-code GPL license
 does not grant rights to game data. The resource manifest and separate checksums
 identify these attachments. A full local installation package can also be rebuilt.
+The 2026-10-21 main resource update additionally includes the Steam installation's
+PAL/desc_cht.dat as desc.dat, retaining its original bytes, Eric-Chen attribution
+and source URL. This supplemental Traditional Chinese description text is not
+part of the source-code GPL grant. No description text file is committed to Git.
 The default v0.1.7 video resource profile uses lossy H.264 Constrained Baseline
 inside AVI, preserving original dimensions, frame rate and PCM audio samples.
 The optional --video-codec original profile retains the original video pixels.

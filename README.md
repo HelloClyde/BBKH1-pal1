@@ -9,7 +9,9 @@
 单独下载的 BDA 复制到设备时命名为“仙剑1.bda”；安装 ZIP 内已使用这个中文名称。
 程序 ZIP 只包含程序与说明；`PAL9588.PAK` 和 `PALVIDEO.PAK` 作为独立 Release 附件提供，
 也可从自己拥有的原版安装目录生成。两个 PAK 下载后按下列路径放置。
-v0.1.9 只更新 BDA；首次安装可从 [v0.1.7](https://github.com/HelloClyde/BBKH1-pal1/releases/tag/v0.1.7) 下载两个资源包。
+补充物品介绍的主资源包在 [v0.1.9](https://github.com/HelloClyde/BBKH1-pal1/releases/tag/v0.1.9) 下载 `PAL9588.PAK`；
+视频包继续使用 [v0.1.7 的 PALVIDEO.PAK](https://github.com/HelloClyde/BBKH1-pal1/releases/download/v0.1.7/PALVIDEO.PAK)。
+已有 v0.1.9 程序时，补充介绍只需替换主资源包，存档、配置与视频包继续使用。
 升级压缩视频时，同时替换 BDA 和 `PALVIDEO.PAK`；`PAL9588.PAK`、配置与存档继续使用。
 新版 BDA 也兼容旧 MS Video 1 视频包；新 H.264 包需要 v0.1.7 或更新程序。
 
@@ -31,13 +33,22 @@ A 盘主资源包存在但损坏时会提示错误，不会自动改用另一盘
 
 ### 从 Steam 安装目录准备资源
 
-需要 Python 和 PATH 中的 FFmpeg。传入自己的 PAL 安装目录：
+需要 Python；处理视频时还需 PATH 中的 FFmpeg。传入自己的 PAL 安装目录：
 
 ```powershell
 python tools/prepare-steam.py --steam-root "D:/SteamLibrary/steamapps/common/PAL" --output build/resources
 ```
 
 工具读取 `PAL_DOS` 的 21 项核心数据和 `PAL98` 的六段 AVI，生成两个 PAK。
+Steam 目录有 `PAL/desc_cht.dat` 时，额外将其原样打包为主资源中的 `desc.dat`，
+补充与 DOS 版繁体词库对应的 296 条物品及仙术说明，并保留 Eric-Chen 的署名。
+自备匹配的说明文件可用 `--descriptions <文件路径>` 指定。
+只补充主资源而不处理视频时，执行以下命令，无需 FFmpeg：
+
+```powershell
+python tools/prepare-steam.py --steam-root "D:/SteamLibrary/steamapps/common/PAL" --output build/item-description-resources --core-only
+```
+
 默认将六段视频编码为适合 H1 的 H.264 Constrained Baseline，使用原始分辨率、帧率和逐样本不变的 PCM 音轨。
 选择 CRF 18、单参考帧、无 B 帧/CABAC/去块滤波与全像素运动搜索，减少 MIPS 解码开销。
 AVI 作为容器不变；压缩的是视频编码。需要保留原始画面数据时，加 `--video-codec original`。
@@ -68,6 +79,12 @@ Release 中的独立 PAK 附件保留原游戏资源权利，不属于源码的 
 ![战斗，完整 H1 固件模拟器](docs/evidence/battle-firmware.png)
 
 系统菜单与按键映射来自 v0.1.9，主菜单和地图来自 v0.1.7；其余截图对应此前的已记录构建，具体哈希与范围见验证文档。
+
+| 补充介绍：药品 | 补充介绍：装备 |
+| --- | --- |
+| ![金创药介绍](docs/evidence/item-description-medicine.png) | ![木剑介绍](docs/evidence/item-description-equipment.png) |
+
+介绍截图来自 v0.1.9 实际 MIPS 程序在 H1 服务模型中的执行，使用此次更新的资源包。
 
 ## 操作
 
@@ -167,6 +184,10 @@ python tests/data_drives.py
 本地真实游戏资源测试使用 `build/resources/PAL9588.PAK`；菜单与地图测试还需要使用者自己的
 `build/verification/native-1.rpg`。可用 `python tools/build.py --regression` 构建独立测试 BDA；
 正式 BDA 不执行测试标记。视频抽样测试默认使用 `build/h264-resources/`，也可用 `--resources` 指定自有资源目录。上述数据不随仓库分发。
+
+含 `desc.dat` 的自有主资源可运行 `python tests/item_descriptions.py --resources <PAL9588.PAK>`，
+检查说明加载、字形、物品界面换行和 480×272 截图；可加 `--baseline <旧PAK>` 检查原有成员字节不变，
+加 `--descriptions <原说明文件>` 核对说明字节不变。结果见 [物品介绍验证](docs/verification-item-descriptions.md)。
 
 提交源码后执行 `python tools/package_release.py` 可生成程序安装 ZIP、含三项固定依赖的完整源码 ZIP、
 BDA、构建信息、验证清单及 SHA256SUMS；此公开打包入口不读取游戏资源。
