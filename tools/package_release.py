@@ -74,24 +74,27 @@ def main():
     ap=argparse.ArgumentParser(description=__doc__);ap.add_argument('--verify',action='store_true');ap.add_argument('--tag');ap.add_argument('--commit')
     args=ap.parse_args();out=ROOT/'dist/release'
     if args.verify:verify(out,args.tag,args.commit);return
-    from verify_release import main as check
+    from verify_release import main as check,EVIDENCE
     check();version=(ROOT/'VERSION').read_text().strip();meta=read(ROOT/'dist/H1PAL.build.json')
     commit=git(ROOT,'rev-parse','HEAD').decode().strip()
     if args.commit:assert commit==args.commit
     if args.tag:assert args.tag=='v'+version
     deps={k:v for k,v in read(ROOT/'UPSTREAM.json').items() if 'path' in v}
     reports={}
-    for name in ('release','wide-ui','wide-battle','display-controls','keymap','music','h264-video','missing','data-drives'):
+    for name in ('release','wide-ui','wide-battle','sharp-scaling','packed-io','display-controls','keymap','music','h264-video','missing','data-drives'):
         r=read(ROOT/f'build/verification/{name}.json');assert r['ok'] and r['sha256']==meta['sha256'];reports[name]=r
     for name,digest in meta['sources'].items():assert sha((ROOT/name).read_bytes())==digest,'Rebuild after source changes: '+name
     out.mkdir(parents=True,exist_ok=True)
     source(out/f'BBKH1-pal1-v{version}-source.zip',deps,commit)
     bda=(ROOT/'dist/仙剑1.bda').read_bytes();(out/'PAL1.bda').write_bytes(bda)
     (out/'H1PAL.build.json').write_bytes((ROOT/'dist/H1PAL.build.json').read_bytes())
-    (out/'RELEASE-NOTES.md').write_bytes((ROOT/f'docs/release-v{version}.md').read_bytes())
+    notes=ROOT/EVIDENCE.get('notes',f'docs/release-v{version}.md')
+    (out/'RELEASE-NOTES.md').write_bytes(notes.read_bytes())
     manifest={'version':version,'application_commit':commit,'dependencies':deps,'bda_sha256':meta['sha256'],
-        'full_firmware_in_ci':False,'hardware_verified':False,'exact_bda_full_firmware_checked':True,
-        'full_firmware_scope':'H1 V1.41 exact BDA: title, old-save map, direct system/keymap entry, custom mapping and separate yes/no quit; mapping A/B persistence, input, synthetic RIX and H.264 in MIPS service model',
+        'full_firmware_in_ci':False,'hardware_verified':EVIDENCE.get('hardware_verified',False),
+        'exact_bda_full_firmware_checked':EVIDENCE['exact_bda_full_firmware_checked'],
+        'full_firmware_scope':EVIDENCE.get('full_firmware_scope','not tested for this build'),
+        'hardware_scope':EVIDENCE.get('hardware_scope','not tested'),
         'download_filename':'PAL1.bda','install_filename':'仙剑1.bda',
         'game_resources_included':False,'checks':reports}
     (out/'release-manifest.json').write_bytes(json_bytes(manifest))

@@ -6,13 +6,18 @@ contexts change; generated C retains the original copyright/license headers.
 def generate(core, directory):
     directory.mkdir(parents=True, exist_ok=True)
     output = {}
-    for name in ('scene.c', 'rngplay.c', 'battle.c', 'video.c', 'uigame.c', 'magicmenu.c', 'itemmenu.c', 'aviplay.c', 'text.c'):
+    for name in ('scene.c', 'rngplay.c', 'battle.c', 'video.c', 'uigame.c', 'magicmenu.c', 'itemmenu.c', 'aviplay.c', 'text.c', 'font.c'):
         text = (core / name).read_text(encoding='utf-8')
         def replace(old, new):
             nonlocal text
             assert text.count(old) == 1, (name, old, text.count(old))
             text = text.replace(old, new)
-        if name == 'text.c':
+        if name == 'font.c':
+            replace('#include "font.h"', '#include "font.h"\n#include "wide_scene.h"')
+            replace('\tLPBYTE dest = (LPBYTE)lpSurface->pixels + y * lpSurface->pitch + x;',
+                    '    h1pal_scene_cover_dirty(lpSurface, x, y, fUse8x8Font ? 8 : font_width[wChar] >> 1, fUse8x8Font ? 8 : _font_height);\n'
+                    '\tLPBYTE dest = (LPBYTE)lpSurface->pixels + y * lpSurface->pitch + x;')
+        elif name == 'text.c':
             replace(r'L"\x8FD4\x56DE\x8A2D\x5B9A"', r'L"\x6309\x9375\x6620\x5C04"')
             replace(r'L"\x8FD4\x56DE\x8BBE\x7F6E"', r'L"\x6309\x952E\x6620\x5C04"')
         elif name == 'aviplay.c':
@@ -33,7 +38,7 @@ def generate(core, directory):
                     '            } else PAL_RenderAVIFrameToSurface(avi->surface, chunk);')
         else:
             replace('#include "main.h"', '#include "main.h"\n#include "wide_scene.h"')
-        if name in ('aviplay.c', 'text.c'):
+        if name in ('aviplay.c', 'text.c', 'font.c'):
             pass
         elif name == 'scene.c':
             replace('if (x >= 320 ||', 'if (x >= gpScreen->w ||')

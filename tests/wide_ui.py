@@ -2,6 +2,7 @@
 from pathlib import Path
 import importlib.util,json,struct,time
 from unicorn.mips_const import UC_MIPS_REG_RA,UC_MIPS_REG_A0,UC_MIPS_REG_A1,UC_MIPS_REG_A2,UC_MIPS_REG_A3,UC_MIPS_REG_SP,UC_MIPS_REG_V0
+from scaling_reference import sample,close
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('pal_machine',ROOT/'tests/mips_smoke.py')
 mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
@@ -38,8 +39,9 @@ for cover in (0,1):
     call('h1pal_platform_present',s)
     assert word(m.meta['symbols']['width'])==480 and word(m.meta['symbols']['height'])==272
     for x,y in ((0,0),(479,0),(0,271),(479,271),(240,136)):
-        i=frame[(y*3//4)*360+x*3//4]
-        assert word(0x82000000+(y*480+x)*4)==(i<<16)|((255-i)<<8)|(i^85)
+        colors=[(i,255-i,i^85) for i in range(256)]
+        expected=sample(raw,320,200,colors,x,y,480,300,14) if cover else sample(frame,360,204,colors,x,y)
+        assert close(word(0x82000000+(y*480+x)*4),expected),'sharp/single-pass cover mismatch'
     call('h1pal_scene_copy',s,backup)
     assert m.read(call('h1pal_scene_pixels',backup),360*204)==frame
     assert call('h1pal_scene_battle_pixels',s)==0,'menu misclassified as battle background'

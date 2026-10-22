@@ -12,6 +12,7 @@ void h1pal_ui_background(SDL_Surface *surface, int cover)
     if (!surface || surface->w != 320 || surface->h != 200) return;
     out = h1pal_scene_ui_frame(surface); in = surface->pixels;
     if (cover) {
+        h1pal_scene_cover_begin(surface);
         /* Title art is decorative: use uniform 9/8 cover, as in battle. */
         for (y = 0; y < H1PAL_MAP_HEIGHT; ++y)
             for (x = 0; x < H1PAL_MAP_WIDTH; ++x)
@@ -19,7 +20,9 @@ void h1pal_ui_background(SDL_Surface *surface, int cover)
         for (y = 0; y < 200; ++y)
             memcpy((Uint8 *)surface->pixels + y * surface->pitch,
                    out + (y + H1PAL_MAP_TOP) * H1PAL_MAP_WIDTH + H1PAL_MAP_LEFT, 320);
+        h1pal_scene_cover_reference(surface, 0);
     } else {
+        h1pal_scene_cover_drop(surface);
         /* Status/equipment FBP art contains baked-in slots and labels.
          * Preserve every central pixel. Extend only the empty texture using
          * its clear rightmost 8-pixel strip; do not repeat the avatar frame. */

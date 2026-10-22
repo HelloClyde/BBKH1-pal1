@@ -17,6 +17,7 @@ void h1pal_battle_load_background(SDL_Surface *surface)
     BYTE *out = h1pal_scene_battle_frame(surface);
     const BYTE *in = surface->pixels;
     int x, y;
+    h1pal_scene_cover_begin(surface);
     /* 320x200 -> 360x225 at 9/8, crop 21 rows around the vertical centre.
      * The same rational factor is used for both axes; no horizontal stretch.
      * Source rows 9..189 remain, and no new color/palette entries are needed. */
@@ -24,6 +25,7 @@ void h1pal_battle_load_background(SDL_Surface *surface)
         for (x = 0; x < H1PAL_MAP_WIDTH; ++x)
             out[y * H1PAL_MAP_WIDTH + x] = in[((y * 8 + 84) / 9) * surface->pitch + x * 8 / 9];
     center_to_legacy(out, surface);
+    h1pal_scene_cover_reference(surface, 0);
 }
 
 void h1pal_battle_make_background(void)
@@ -47,6 +49,8 @@ void h1pal_battle_make_background(void)
     canvas = *g_Battle.lpSceneBuf;
     canvas.w = canvas.pitch = H1PAL_MAP_WIDTH; canvas.h = H1PAL_MAP_HEIGHT; canvas.pixels = pixels;
     PAL_ApplyWave(&canvas);
+    if (gpGlobals->wScreenWave) h1pal_scene_cover_drop(g_Battle.lpSceneBuf);
+    else h1pal_scene_cover_copy(g_Battle.lpBackground, g_Battle.lpSceneBuf, g_Battle.sBackgroundColorShift);
     center_to_legacy(pixels, g_Battle.lpSceneBuf);
 }
 
@@ -69,24 +73,28 @@ extern INT H1PAL_InternalRLEMono(LPCBITMAPRLE, SDL_Surface *, PAL_POS, BYTE, INT
 
 INT PAL_RLEBlitToSurface(LPCBITMAPRLE bitmap, SDL_Surface *surface, PAL_POS pos)
 {
+    h1pal_scene_cover_dirty(surface, PAL_X(pos), PAL_Y(pos), PAL_RLEGetWidth(bitmap), PAL_RLEGetHeight(bitmap));
     SDL_Surface canvas; PAL_POS shifted = pos;
     if (extended_canvas(surface, &canvas, &shifted)) H1PAL_InternalRLE(bitmap, &canvas, shifted);
     return H1PAL_InternalRLE(bitmap, surface, pos);
 }
 INT PAL_RLEBlitToSurfaceWithShadow(LPCBITMAPRLE bitmap, SDL_Surface *surface, PAL_POS pos, BOOL shadow)
 {
+    h1pal_scene_cover_dirty(surface, PAL_X(pos), PAL_Y(pos), PAL_RLEGetWidth(bitmap), PAL_RLEGetHeight(bitmap));
     SDL_Surface canvas; PAL_POS shifted = pos;
     if (extended_canvas(surface, &canvas, &shifted)) H1PAL_InternalRLEShadow(bitmap, &canvas, shifted, shadow);
     return H1PAL_InternalRLEShadow(bitmap, surface, pos, shadow);
 }
 INT PAL_RLEBlitWithColorShift(LPCBITMAPRLE bitmap, SDL_Surface *surface, PAL_POS pos, INT color)
 {
+    h1pal_scene_cover_dirty(surface, PAL_X(pos), PAL_Y(pos), PAL_RLEGetWidth(bitmap), PAL_RLEGetHeight(bitmap));
     SDL_Surface canvas; PAL_POS shifted = pos;
     if (extended_canvas(surface, &canvas, &shifted)) H1PAL_InternalRLEShift(bitmap, &canvas, shifted, color);
     return H1PAL_InternalRLEShift(bitmap, surface, pos, color);
 }
 INT PAL_RLEBlitMonoColor(LPCBITMAPRLE bitmap, SDL_Surface *surface, PAL_POS pos, BYTE color, INT shift)
 {
+    h1pal_scene_cover_dirty(surface, PAL_X(pos), PAL_Y(pos), PAL_RLEGetWidth(bitmap), PAL_RLEGetHeight(bitmap));
     SDL_Surface canvas; PAL_POS shifted = pos;
     if (extended_canvas(surface, &canvas, &shifted)) H1PAL_InternalRLEMono(bitmap, &canvas, shifted, color, shift);
     return H1PAL_InternalRLEMono(bitmap, surface, pos, color, shift);

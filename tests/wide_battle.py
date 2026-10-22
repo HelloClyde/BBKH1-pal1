@@ -3,6 +3,7 @@ from pathlib import Path
 import importlib.util, json, struct, time
 from elftools.elf.elffile import ELFFile
 from unicorn.mips_const import UC_MIPS_REG_RA,UC_MIPS_REG_A0,UC_MIPS_REG_A1,UC_MIPS_REG_A2,UC_MIPS_REG_A3,UC_MIPS_REG_SP,UC_MIPS_REG_V0
+from scaling_reference import sample,close
 ROOT=Path(__file__).resolve().parents[1]
 spec=importlib.util.spec_from_file_location('pal_machine',ROOT/'tests/mips_smoke.py')
 mod=importlib.util.module_from_spec(spec);spec.loader.exec_module(mod)
@@ -50,8 +51,8 @@ for raw in (bytes((x^y)%256 for y in range(200) for x in range(320)),
     assert frame(scene)==expected and data(scene)==crop(expected)
     call('h1pal_platform_present',scene)
     for x,y in ((0,0),(479,0),(0,271),(479,271),(40,80)):
-        i=expected[(y*3//4)*360+x*3//4]
-        assert rgb(x,y)==(i<<16)|((i^85)<<8)|(255-i)
+        colors=[(i,i^85,255-i) for i in range(256)]
+        assert close(rgb(x,y),sample(raw,320,200,colors,x,y,480,300,14)),'battle must sample original art once'
 for phase in range(6):call('h1pal_scene_switch',bg,scene,phase)
 assert frame(scene)==frame(bg),'transition lost the new edges'
 # A sprite crossing x=0 draws into the extra left columns without changing
@@ -80,7 +81,8 @@ m.word(g+gf['fInBattle'],0)
 assert call('h1pal_scene_pixels',scene)==0,'stale battle margins outside combat'
 call('SDL_FreeSurface',scene);call('SDL_FreeSurface',bg);call('h1pal_scene_shutdown');call('h1pal_platform_close')
 assert not m.allocations and not m.handles
-r={'ok':True,'sha256':m.meta['sha256'],'background_scale':'9/8','display_scale':'4/3',
+r={'ok':True,'sha256':m.meta['sha256'],'legacy_compatibility_background_scale':'9/8',
+   'display_background_scale':'single-pass 3/2 cover from original','foreground_display_scale':'4/3 sharp bilinear',
    'fullscreen':[480,272],'coordinate_grid_verified':True,'four_rle_variants_at_edge':True,
    'palette_shift':True,'max_wave':True,'fixed_fullscreen':True,'clean_exit':True,'seconds':round(time.monotonic()-started,2)}
 (ROOT/'build/verification/wide-battle.json').write_text(json.dumps(r,indent=2)+'\n');print(json.dumps(r,indent=2))

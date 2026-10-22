@@ -38,7 +38,7 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tools/install_toolchain.py
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
-      - name: Build reproducible BDA and validate exact tested bytes
+      - name: Build reproducible BDA and validate recorded bytes
         run: |
           python tools/build.py
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
@@ -51,6 +51,10 @@ jobs:
           python tests/wide_ui.py
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tests/wide_battle.py
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python tests/sharp_scaling.py
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python tests/packed_io.py
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tests/display_controls.py
           if ($LASTEXITCODE) { exit $LASTEXITCODE }

@@ -22,6 +22,7 @@
 #define PALPAK_ENTRY_SIZE 64u
 #define PALPAK_MAX_ENTRIES 256u
 #define H1PAL_FILE_SLOTS 32u
+#define H1PAL_READ_AHEAD_SIZE 4096u
 
 typedef union allocation_header {
     struct {
@@ -42,6 +43,10 @@ struct h1pal_file {
     uint32_t packed_base;
     uint32_t packed_size;
     uint32_t packed_position;
+    /* Per-stream data: archive members share a native file handle. */
+    unsigned char *read_ahead;
+    uint32_t read_ahead_base;
+    uint32_t read_ahead_size;
 };
 
 typedef struct palpak_archive {
@@ -912,6 +917,8 @@ FILE *fopen(const char *path, const char *mode)
     stream->packed_base = packed_base;
     stream->packed_size = packed_size;
     stream->packed_position = 0u;
+    stream->read_ahead = 0;
+    stream->read_ahead_base = stream->read_ahead_size = 0u;
     return stream;
 }
 
@@ -928,6 +935,8 @@ int fclose(FILE *stream)
     int result;
     if (!stream || stream->standard) return EOF;
     result = stream->packed ? 0 : h1pal_fs_close_raw(stream->handle);
+    free(stream->read_ahead);
+    stream->read_ahead = 0;
     h1pal_file_release(stream);
     return result;
 }
@@ -997,6 +1006,31 @@ size_t fwrite(
 int fgetc(FILE *stream)
 {
     unsigned char character;
+    if (stream && stream->packed) {
+        uint32_t position = stream->packed_position;
+        if (position >= stream->packed_size) {
+            stream->eof = 1;
+            return EOF;
+        }
+        if (!stream->read_ahead)
+            stream->read_ahead = malloc(H1PAL_READ_AHEAD_SIZE);
+        if (stream->read_ahead) {
+            if (position < stream->read_ahead_base ||
+                position - stream->read_ahead_base >= stream->read_ahead_size) {
+                uint32_t count = stream->packed_size - position;
+                if (count > H1PAL_READ_AHEAD_SIZE) count = H1PAL_READ_AHEAD_SIZE;
+                stream->read_ahead_base = position;
+                stream->read_ahead_size = fread(stream->read_ahead, 1u, count, stream);
+                /* fread advances the logical cursor; expose only this byte. */
+                stream->packed_position = position;
+                if (!stream->read_ahead_size) return EOF;
+            }
+            character = stream->read_ahead[position - stream->read_ahead_base];
+            stream->packed_position = position + 1u;
+            return character;
+        }
+        /* Allocation failure retains the unbuffered, bounded read path. */
+    }
     return fread(&character, 1u, 1u, stream) == 1u ? character : EOF;
 }
 
@@ -1084,9 +1118,9 @@ char *fgets(char *buffer, int size, FILE *stream)
     int index = 0;
     if (!buffer || size <= 0 || !stream) return 0;
     while (index + 1 < size) {
-        char character;
-        if (fread(&character, 1u, 1u, stream) != 1u) break;
-        buffer[index++] = character;
+        int character = fgetc(stream);
+        if (character == EOF) break;
+        buffer[index++] = (char)character;
         if (character == '\n') break;
     }
     if (index == 0) return 0;

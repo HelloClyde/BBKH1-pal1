@@ -233,6 +233,7 @@ int SDL_FillRect(SDL_Surface *surface, SDL_Rect *rect, Uint32 color)
     normalize_rect(surface, rect, &area);
     if (area.x == 0 && area.y == 0 && area.w == surface->w && area.h == surface->h)
         h1pal_scene_clear(surface);
+    else h1pal_scene_cover_dirty(surface, area.x, area.y, area.w, area.h);
     bytes_per_pixel = surface->format->BytesPerPixel;
     for (y = area.y; y < area.y + area.h && y < surface->h; ++y) {
         Uint8 *row = (Uint8 *)surface->pixels + y * surface->pitch;
@@ -292,6 +293,7 @@ int SDL_UpperBlit(
     if (from.x == 0 && from.y == 0 && from.w == source->w && from.h == source->h &&
         to.x == 0 && to.y == 0 && from.w == destination->w && from.h == destination->h)
         h1pal_scene_copy(source, destination);
+    else h1pal_scene_cover_blit(source, &from, destination, &to);
     for (row = 0; row < from.h; ++row) {
         const Uint8 *in = (const Uint8 *)source->pixels +
             (from.y + row) * source->pitch + from.x * bytes_per_pixel;

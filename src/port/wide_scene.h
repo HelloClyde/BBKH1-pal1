@@ -6,6 +6,14 @@
 #define H1PAL_MAP_HEIGHT 204
 #define H1PAL_MAP_LEFT 20
 #define H1PAL_MAP_TOP 2
+typedef struct H1PAL_CoverView { const Uint32 *rgb; const Uint16 *reference; } H1PAL_CoverView;
+void h1pal_scene_cover_begin(SDL_Surface *surface);
+void h1pal_scene_cover_reference(SDL_Surface *surface, int color_shift);
+void h1pal_scene_cover_copy(SDL_Surface *source, SDL_Surface *destination, int color_shift);
+void h1pal_scene_cover_drop(SDL_Surface *surface);
+void h1pal_scene_cover_dirty(SDL_Surface *surface, int x, int y, int w, int h);
+void h1pal_scene_cover_blit(SDL_Surface *source, const SDL_Rect *from, SDL_Surface *destination, const SDL_Rect *to);
+void h1pal_scene_cover_view(const SDL_Surface *surface, const Uint32 *palette, H1PAL_CoverView *view);
 void h1pal_scene_begin(void);
 void h1pal_scene_end(void);
 void h1pal_scene_clear(SDL_Surface *surface);

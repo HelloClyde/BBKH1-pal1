@@ -7,6 +7,7 @@
 #include "pal_config.h"
 #include "wide_scene.h"
 #include "keymap.h"
+#include "scaler.h"
 #include <stdio.h>
 #include <string.h>
 static int opened,timer,closing;
@@ -45,6 +46,7 @@ int h1pal_platform_open(void){
  h1_timer_start();timer=1;geometry();h1pal_log("VIDEO 480x272 stride=1920 bpp=32 lcd=%p",(void*)lcd);return 1;
 }
 void h1pal_platform_close(void){
+ h1pal_scale_shutdown();
  if(timer){h1_timer_stop();timer=0;}
  if(opened){typedef int(*fn)(void);fn close=(fn)gui(0x850);if(close)close();opened=0;}lcd=0;
 }
@@ -56,12 +58,10 @@ void h1pal_platform_present(const SDL_Surface *s){
  if(extended_map!=!!wide){extended_map=!!wide;geometry();}
  uint32_t palette[256];for(unsigned i=0;i<256;++i){SDL_Color c=s->format->palette->colors[i];palette[i]=(c.r<<16)|(c.g<<8)|c.b;}
  SDL_H1AudioPump();
- for(unsigned y=0;y<height;++y){volatile uint32_t *out=lcd+(top+y)*480+left;
- if(map_full){unsigned sy=ymap[y];const Uint8 *in=wide+sy*H1PAL_MAP_WIDTH;
- for(unsigned x=0;x<width;++x){unsigned sx=xmap[x];Uint8 c=in[sx];
- if(sx>=H1PAL_MAP_LEFT&&sx<H1PAL_MAP_LEFT+320&&sy>=H1PAL_MAP_TOP&&sy<H1PAL_MAP_TOP+200)
- c=((const Uint8*)s->pixels)[(sy-H1PAL_MAP_TOP)*s->pitch+sx-H1PAL_MAP_LEFT];out[x]=palette[c];}}
- else{const Uint8 *in=(const Uint8*)s->pixels+ymap[y]*s->pitch;for(unsigned x=0;x<width;++x)out[x]=palette[in[xmap[x]]];}}
+ unsigned started=h1pal_platform_ticks();
+ h1pal_scale_present(s,wide,palette,lcd,width,height,left);
+ unsigned elapsed=h1pal_platform_ticks()-started;
+ ++h1pal_scale_frames;h1pal_scale_total_ms+=elapsed;if(elapsed>h1pal_scale_max_ms)h1pal_scale_max_ms=elapsed;
  ++h1pal_stats.frames;SDL_H1AudioPump();
 }
 void h1pal_platform_present_rgb555(const Uint16 *pixels,int w,int h,int pitch){

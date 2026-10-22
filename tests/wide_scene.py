@@ -4,6 +4,7 @@ import importlib.util, json, struct, time
 from unicorn import UC_HOOK_CODE
 from unicorn.mips_const import UC_MIPS_REG_A0, UC_MIPS_REG_PC, UC_MIPS_REG_RA
 from PIL import Image, ImageChops
+from scaling_reference import sample,close
 ROOT = Path(__file__).resolve().parents[1]
 spec = importlib.util.spec_from_file_location('pal_machine', ROOT/'tests/mips_smoke.py')
 mod = importlib.util.module_from_spec(spec); spec.loader.exec_module(mod)
@@ -52,9 +53,11 @@ assert shots[3]['lcd'].tobytes() == shots[21]['lcd'].tobytes(), 'partial UI refr
 assert shots[2]['lcd'].crop((0, 0, 22, 272)).getbbox() is None, 'fixed background stretched'
 assert shots[1]['lcd'].crop((0, 0, 22, 272)).getbbox(), 'extra map columns missing'
 indices = shots[1]['wide'].tobytes(); palette = shots[1]['palette']
-expected = b''.join(palette[4*indices[(y*3//4)*360+x*3//4]:4*indices[(y*3//4)*360+x*3//4]+3]
-                    for y in range(272) for x in range(480))
-assert expected == shots[1]['lcd'].tobytes(), 'map was not uniformly scaled by 4/3'
+colors = [tuple(palette[4*i:4*i+3]) for i in range(256)]
+for y in (*range(0,272,17),271):
+    for x in (*range(0,480,23),479):
+        r,g,b=shots[1]['lcd'].getpixel((x,y))
+        assert close((r<<16)|(g<<8)|b,sample(indices,360,204,colors,x,y)), 'map sharp 4/3 scaling mismatch'
 assert shots[8]['lcd'].crop((0, 0, 22, 272)).getbbox() is None, 'battle reused map margins'
 assert shots[9]['lcd'].crop((0, 5, 22, 265)).getbbox(), 'screen shake lost map margins'
 npc_difference = ImageChops.difference(shots[5]['wide'], shots[6]['wide'])
