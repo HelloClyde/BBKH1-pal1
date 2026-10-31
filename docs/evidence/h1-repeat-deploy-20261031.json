@@ -1,0 +1,33 @@
+{
+  "date": "2026-10-31",
+  "device": "Physical BBK H1/Y100 V1.41",
+  "identity": "H1DEBUG/1 V1.41 RESIDENT",
+  "bda_sha256": "5c8ed6d17dfd8917204bdbce134f922c75dbc9be21fec0895f7c4669831e60c9",
+  "bda_size": 2523220,
+  "install_path": "A:\\应用\\程序\\仙剑1.bda",
+  "resource_drive": "B",
+  "resources_changed": false,
+  "save_files_changed": false,
+  "device_readback_crc_verified": true,
+  "crc32": 2788484226,
+  "transaction_state": "done",
+  "upload_elapsed_seconds": 175.125,
+  "desktop_refresh_completed": true,
+  "payload_entry_count_before": 152,
+  "payload_entry_count_after": 153,
+  "startup_video_observed": true,
+  "startup_frames_observed": 1042,
+  "runtime_error": 0,
+  "usb_fault": 0,
+  "screen_dimensions": [
+    480,
+    272
+  ],
+  "screen": "h1-repeat-startup-20261031.png",
+  "screen_sha256": "c161fc0755640c7e8e59448c63281c7fe62aea0808b1364b41255486e260a553",
+  "r_repeat_hardware_tested": false,
+  "r_repeat_validation": "Actual MIPS service model with native input and owner-resource battle UI; not a physical battle test.",
+  "full_firmware_tested": false,
+  "debugger_left_running": true,
+  "scope": "Complete BDA upload, device readback CRC, desktop refresh, native payload execution and opening video on physical H1. No physical battle-repeat or rendering timing measurement."
+}

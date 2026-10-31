@@ -18,6 +18,7 @@ void h1pal_platform_settings_input(int enabled);
 void h1pal_platform_capture_keys(int enabled);
 unsigned h1pal_platform_take_capture_key(void);
 int h1pal_platform_detached(void);
+int h1pal_platform_in_battle(void);
 Uint32 h1pal_platform_ticks(void);
 void h1pal_platform_delay(Uint32 milliseconds);
 

@@ -418,9 +418,9 @@ int SDL_SaveBMP(SDL_Surface *surface, const char *path)
 
 int SDL_PollEvent(SDL_Event *event)
 {
-    static const SDLKey key_symbols[6] = {
+    static const SDLKey key_symbols[7] = {
         SDLK_UP, SDLK_DOWN, SDLK_LEFT,
-        SDLK_RIGHT, SDLK_RETURN, SDLK_ESCAPE
+        SDLK_RIGHT, SDLK_RETURN, SDLK_ESCAPE, SDLK_r
     };
     unsigned keys;
     unsigned change;
@@ -459,7 +459,7 @@ int SDL_PollEvent(SDL_Event *event)
     keys = h1pal_platform_keys();
     g_pending_changes |= keys ^ g_previous_keys;
     if (g_pending_changes == 0u) return 0;
-    for (index = 0; index < 6; ++index) {
+    for (index = 0; index < 7; ++index) {
         change = 1u << index;
         if (g_pending_changes & change) {
             g_pending_changes &= ~change;

@@ -81,7 +81,7 @@ def main():
     if args.tag:assert args.tag=='v'+version
     deps={k:v for k,v in read(ROOT/'UPSTREAM.json').items() if 'path' in v}
     reports={}
-    for name in ('release','wide-ui','wide-battle','sharp-scaling','packed-io','display-controls','keymap','music','h264-video','missing','data-drives'):
+    for name in ('release','wide-ui','wide-battle','sharp-scaling','packed-io','display-controls','keymap','battle-repeat','music','h264-video','missing','data-drives'):
         r=read(ROOT/f'build/verification/{name}.json');assert r['ok'] and r['sha256']==meta['sha256'];reports[name]=r
     for name,digest in meta['sources'].items():assert sha((ROOT/name).read_bytes())==digest,'Rebuild after source changes: '+name
     out.mkdir(parents=True,exist_ok=True)

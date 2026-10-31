@@ -45,3 +45,8 @@ INT UTIL_Platform_Init(int argc, char *argv[])
 }
 
 VOID UTIL_Platform_Quit(VOID) {}
+
+int h1pal_platform_in_battle(void)
+{
+    return gpGlobals && gpGlobals->fInBattle;
+}

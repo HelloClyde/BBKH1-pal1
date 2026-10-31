@@ -60,6 +60,8 @@ jobs:
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tests/keymap.py
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
+          python tests/battle_repeat.py
+          if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tests/music.py
           if ($LASTEXITCODE) { exit $LASTEXITCODE }
           python tests/h264_video.py

@@ -1,17 +1,18 @@
 {
   "version": "0.1.9",
   "status": "unreleased main after v0.1.9",
-  "date": "2026-10-23",
-  "bda_sha256": "8b44f8b3219f93c708f00511377d41750e0f918df6e9454e2402835a4f857a30",
+  "date": "2026-10-31",
+  "bda_sha256": "5c8ed6d17dfd8917204bdbce134f922c75dbc9be21fec0895f7c4669831e60c9",
   "notes": "docs/unreleased.md",
   "exact_bda_full_firmware_checked": false,
   "full_firmware_in_ci": false,
   "full_firmware_scope": "Not rerun for this build; historical v0.1.9 firmware evidence applies only to its recorded old SHA-256.",
   "hardware_verified": true,
-  "hardware_scope": "Physical H1/Y100 V1.41: H1Debug complete BDA deployment and device readback CRC, startup and opening-video screenshot. User tested the installed build and confirmed rendering time acceptable. No agent-collected map timing numbers or complete gameplay validation.",
+  "hardware_scope": "This exact BDA was deployed to physical H1 with device readback CRC, native payload execution and opening video observed. R repeat is checked in the MIPS service model with battle UI, not a physical battle. Prior user timing feedback applies only to prior_hardware_bda_sha256.",
+  "prior_hardware_bda_sha256": "8b44f8b3219f93c708f00511377d41750e0f918df6e9454e2402835a4f857a30",
   "resource_drive": "B",
   "resource_changes": false,
-  "user_reported_rendering_time_acceptable": true,
+  "user_reported_rendering_time_acceptable_for_prior_hardware_build": true,
   "hardware_timing_measurement_available": false,
   "sdk_commit": "067fe072477861dfc8949d7b1a55279fb92d2548",
   "sdlpal_commit": "224cb0a0cc839e0e8ecaa299cd480b02b372b9f7",
@@ -22,5 +23,7 @@
   "startup_io_after_native_reads": 174,
   "startup_io_before_native_seeks": 331368,
   "startup_io_after_native_seeks": 159,
-  "game_resources_in_source": false
+  "game_resources_in_source": false,
+  "hardware_evidence": "docs/evidence/h1-repeat-deploy-20261031.json",
+  "r_repeat_hardware_tested": false
 }

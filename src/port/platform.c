@@ -89,14 +89,20 @@ static void touch_event(int event){
 }
 void h1pal_platform_pump(void){
  if(!opened)return;
+ /* R is a battle-only shortcut. Explicit six-action bindings take priority. */
+ unsigned repeat=(!settings_input&&!capturing_keys&&h1pal_platform_in_battle()&&
+                  !h1pal_keymap_action(H1_KEY_R,0))?(1u<<H1PAL_KEY_COUNT):0;
+ if(!repeat)latched&=~(1u<<H1PAL_KEY_COUNT);
  for(unsigned i=0;i<32;++i){int event=-1,value=-1;h1_event_fetch(&event,&value);if(event==-1&&value==-1)break;
  if(event==11||event==12||event==8)touch_event(event);
  if(event==H1_EVENT_KEY_DOWN){++h1pal_stats.keys;if(value==H1_KEY_BACK)closing=1;
  if(capturing_keys&&!captured_key)captured_key=h1pal_keymap_normalize(value);
+ if(repeat&&value==H1_KEY_R)latched|=repeat;
  latched|=h1pal_keymap_action(value,settings_input);}}
  if(touch_active)touch_event(12);
  unsigned keys=0;
  for(unsigned i=0;i<H1PAL_KEY_COUNT;++i)if(down(settings_input?h1pal_keymap_default(i):h1pal_keymap_get(i)))keys|=1u<<i;
+ if(repeat&&down(H1_KEY_R))keys|=repeat;
  if(capturing_keys&&!captured_key)for(unsigned key=1;key<=40;++key)if(h1pal_keymap_normalize(key)==key&&down(key)){captured_key=key;break;}
  latched|=keys&~sampled;sampled=keys;
  /* The emergency exit remains tied to physical Enter+Escape, regardless of mappings. */
